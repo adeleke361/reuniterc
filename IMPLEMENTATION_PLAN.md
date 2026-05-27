@@ -20,7 +20,8 @@ Scope:
 - Create repository interfaces for events, cases, SafeCards, matches, handovers, announcements and audit logs.
 - Implement seeded fictional demo-data adapter.
 - Implement role and permission helpers.
-- Add unit tests for status transitions and permissions.
+- Add explicit workflow state machine and Assisted Match Engine.
+- Add unit tests for permissions, state transitions, handover safety, match scoring, PA escalation, offline sync and leadership aggregation.
 
 Acceptance criteria:
 
@@ -28,6 +29,11 @@ Acceptance criteria:
 - No real identities are used.
 - UI can read data through services, not hard-coded page constants.
 - Match and handover actions are audit-log-ready.
+- Offline reports remain `pending_sync` until successful synchronisation.
+- Connected coordinator workflow is required for match confirmation, guardian verification and final handover closure.
+- Leadership dashboard summary is aggregate/anonymised.
+
+Status: implemented in the Phase 1 safety kernel.
 
 ## Phase 2: Operations Shell And Dashboard
 
@@ -124,6 +130,7 @@ Acceptance criteria:
 - Case appears in pending sync state.
 - Restoring connectivity syncs the operation into demo repositories.
 - Duplicate submissions are prevented by idempotency keys.
+- Offline mode does not allow match confirmation, guardian verification or final handover closure.
 
 ## Phase 8: Supabase Integration
 
@@ -134,6 +141,8 @@ Scope:
 - Implement Supabase repository adapter.
 - Add Supabase Auth session mapping.
 - Draft RLS policies.
+- Implement authenticated workflow mutations with server actions.
+- Use route handlers for sync/API-style operations where appropriate.
 
 Acceptance criteria:
 
@@ -141,6 +150,7 @@ Acceptance criteria:
 - Database schema matches `DATA_MODEL.md`.
 - Staff role boundaries are enforced.
 - Build remains Vercel-compatible.
+- SafeCard raw tokens are generated server-side and only token hashes are persisted.
 
 ## Phase 9: Analytics And Submission Assets
 

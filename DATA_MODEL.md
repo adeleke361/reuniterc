@@ -2,6 +2,18 @@
 
 This document describes the planned Supabase PostgreSQL schema. All sample data must be fictional.
 
+## Domain Status Values
+
+The Phase 1 TypeScript domain kernel defines explicit unions for operational status values:
+
+- case status: `pending_sync`, `reported`, `under_review`, `match_pending_handover`, `safely_reunited`, `closed_unresolved`;
+- match status: `suggested`, `confirmed`, `rejected`;
+- escalation status: `draft`, `queued`, `announced`, `resolved`, `cancelled`;
+- offline sync status: `pending`, `synced`, `failed`;
+- connectivity status: `stable`, `degraded`.
+
+`pending_sync` is used for locally captured offline reports until synchronisation succeeds. `safely_reunited` requires a verified handover record.
+
 ## Entity: events
 
 Purpose: programme or service context for cases.
@@ -151,6 +163,7 @@ Privacy notes:
 
 - Sensitive notes are staff-only.
 - Leadership analytics must use anonymised or aggregated data.
+- Offline-created case records may exist locally as `pending_sync` before server synchronisation.
 
 ## Entity: case_matches
 
@@ -242,6 +255,7 @@ Important fields:
 - `client_operation_id text not null unique`
 - `operation_type text not null`
 - `actor_staff_id uuid references staff_profiles(id)`
+- `local_entity_id uuid`
 - `payload jsonb not null`
 - `status text not null`
 - `attempt_count integer not null default 0`
@@ -257,6 +271,8 @@ Indexes:
 Privacy notes:
 
 - Payloads can include sensitive case details and must follow staff-only access policies.
+- Offline payloads are limited to new missing reports, found reports and draft PA escalation requests.
+- Match confirmation, guardian verification and final handover closure are intentionally excluded from offline sync operations.
 
 ## Entity: audit_logs
 
@@ -293,5 +309,9 @@ Privacy notes:
 - Case matches connect one missing case to one found case.
 - Handover records close confirmed cases as safely reunited.
 - Announcement escalations reference unresolved cases.
-- Offline sync operations record queued mutations.
+- Offline sync operations record queued mutations and may reference a local pending case record.
 - Audit logs reference important state changes across entities.
+
+## SafeCard Token Privacy
+
+Production storage must contain only `token_hash` and `token_last4`. Raw QR tokens are generated server-side and returned only at generation time for display/printing. Demo data may use fictional token strings for tests and manual lookup, but repository and service interfaces remain hash-based.

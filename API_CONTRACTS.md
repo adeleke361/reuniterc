@@ -2,6 +2,16 @@
 
 The prototype may implement these as Next.js route handlers or server actions. Payloads are shown as REST-style contracts for clarity. All examples use fictional data.
 
+## Implementation Pattern
+
+The locked Supabase design is hybrid:
+
+- authenticated workflow mutations should use server actions when the Supabase adapter is added;
+- sync/API-style operations may use route handlers where appropriate;
+- the Phase 1 demo adapter uses in-memory repositories behind the same service contracts.
+
+Offline sync is limited to new missing-person reports, found-person reports and draft PA escalation requests. Match confirmation, guardian verification and final handover closure require connected coordinator workflow.
+
 ## Shared Error Shape
 
 ```json
@@ -53,6 +63,7 @@ Notes:
 - `qrToken` is returned only at generation time.
 - QR content must contain only the secure token.
 - Server storage should use a token hash.
+- Production token generation must occur server-side with cryptographically secure randomness.
 
 ## Authorised SafeCard Token Lookup
 
@@ -329,6 +340,18 @@ Error:
 }
 ```
 
+Connected-workflow error:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "connected_workflow_required",
+    "message": "Verified handover closure requires connected coordinator workflow."
+  }
+}
+```
+
 ## Escalate To PA Announcement
 
 Route: `POST /api/announcements`
@@ -440,3 +463,9 @@ Success:
   }
 }
 ```
+
+Offline operation constraints:
+
+- `submit_missing_case` and `submit_found_case` may create local `pending_sync` records before sync.
+- `draft_announcement_escalation` may be queued offline as a draft only.
+- Match decisions and verified handovers are not accepted through offline sync.

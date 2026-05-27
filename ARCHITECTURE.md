@@ -4,6 +4,15 @@
 
 ReuniteRC is a Next.js App Router application designed for Vercel deployment, Supabase-backed persistence and offline-resilient case capture. The first prototype uses seeded fictional demo data behind stable service interfaces. Supabase adapters can replace or augment demo repositories without rewriting product UI.
 
+## Locked Architecture Decisions
+
+- Supabase access uses a hybrid pattern. Authenticated workflow mutations should use server actions when the Supabase adapter is added. Sync/API-style operations may use route handlers where appropriate.
+- Production SafeCard tokens are server-generated cryptographically secure random values. Persistent storage stores token hashes only, never raw QR tokens. The demo adapter simulates lookup with fictional token data behind the same hash-based interface.
+- Judged MVP supports QR card generation and simulated/manual token lookup. Camera scanning is optional later and does not block the core demo.
+- Offline mode may capture new missing-person reports, found-person reports and draft PA escalation requests. Match confirmation, guardian verification and final handover closure require connected coordinator workflow as a safeguarding boundary.
+- Demo analytics use service-layer aggregation. Production may add secured database views for anonymised leadership reporting.
+- Initial prototype sessions may be clearly labelled fictional demo role sessions. The architecture remains prepared for Supabase Auth and Row Level Security.
+
 ## Layered Architecture
 
 Presentation layer:
@@ -43,7 +52,8 @@ Infrastructure layer:
 - Supabase client setup;
 - Supabase Auth session handling;
 - IndexedDB schema and sync queue;
-- server actions or REST route handlers;
+- server actions for authenticated workflow mutations;
+- route handlers for sync/API-style operations where appropriate;
 - deployment and environment configuration.
 
 ## Technology Stack
@@ -63,6 +73,8 @@ Infrastructure layer:
 ## Authentication And Authorisation
 
 Supabase Auth is the planned identity provider. Staff accounts authenticate through Supabase. Staff profile records map authenticated users to application roles.
+
+The initial prototype may use clearly labelled fictional demo role sessions so judges can exercise workflows without live Supabase credentials. Demo sessions must never be presented as production authentication.
 
 Planned roles:
 
@@ -85,21 +97,30 @@ Supabase Row Level Security should enforce role boundaries at the database layer
 The prototype must support real offline-style capture:
 
 - A local connectivity state can be toggled to simulate degraded conditions.
-- Mutations that cannot be sent immediately are written to IndexedDB.
+- New missing-person reports, found-person reports and draft PA escalation requests that cannot be sent immediately are written to IndexedDB.
 - Each queued operation stores operation type, payload, client timestamp, actor role, idempotency key and sync status.
 - When connectivity is restored, the sync service replays queued operations through the same application service contracts.
 - Sync results update local operation records and create audit entries.
+
+Safeguarding boundary:
+
+- Match confirmation must require connected coordinator workflow.
+- Guardian verification must require connected coordinator workflow.
+- Final handover closure must require connected coordinator workflow.
+- Offline mode must not create conflicting or unsafe handover completions.
 
 Conflict handling:
 
 - Use server-generated canonical IDs for synced records.
 - Use client-generated idempotency keys to prevent duplicate case creation.
 - Prefer append-only audit logs for critical events.
-- Do not allow offline handover closure unless the verification step can be recorded and later reconciled.
+- Do not allow offline handover closure.
 
 ## Data Security Approach
 
 - SafeCard QR codes encode only secure random tokens.
+- Production token generation occurs server-side.
+- Persistent storage stores token hashes only.
 - Sensitive details remain in authorised staff views.
 - Leadership views should aggregate or anonymise case data.
 - Avoid storing phone numbers or direct identifiers in demo QR content.
@@ -129,4 +150,17 @@ Deployment expectations:
 - PA announcement execution remains outside the app, but escalation status is tracked.
 - Live Supabase credentials may not be available during early prototyping.
 - Network availability may be unstable during large programmes.
-- QR scanning can be represented initially by manual token entry, then enhanced with camera scanning if appropriate.
+- QR scanning is represented in the judged MVP by manual/simulated token entry, then enhanced with camera scanning later if appropriate.
+
+## Phase 1 Safety Kernel
+
+Phase 1 adds the typed domain and service kernel that powers later UI work:
+
+- strict TypeScript entities for events, HelpPoints, staff, guardians, Safety Cards, cases, matches, handovers, announcements, offline sync operations and audit logs;
+- explicit case state transition rules;
+- typed role permission helpers;
+- repository interfaces for all core operational stores;
+- in-memory demo repositories seeded with fictional Congress Night 2026 data;
+- rule-based Assisted Match Engine with transparent scoring reasons;
+- service-layer dashboard aggregation for operational and leadership views;
+- unit tests for permissions, state transitions, handover safety, match scoring, PA escalation and offline sync.
