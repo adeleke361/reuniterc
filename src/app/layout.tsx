@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ReuniteRC",
   description:
-    "Offline-resilient digital operating layer for authorised Redemption City family reunification support."
+    "Digital Reunification and Lost-and-Found solution for Major Programmes in Redemption City."
 };
 
 export default function RootLayout({

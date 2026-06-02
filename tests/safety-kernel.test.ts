@@ -12,6 +12,16 @@ import {
   DomainRuleError,
   hasPermission
 } from "../src/domain";
+import {
+  advanceGuidedDemoStep,
+  completeItemReleaseRuntime,
+  completePersonHandoverRuntime,
+  createInitialGuidedDemoState,
+  queueOfflineDemoReport,
+  resetGuidedDemoScenario,
+  setGuidedDemoConnectivity
+} from "../src/demo/guided-demo";
+import { getDemoScenarioSnapshot } from "../src/demo/scenario-data";
 import { DEMO_EVENT_ID } from "../src/repositories/demo/seed-data";
 import { createDemoSafetyKernel } from "../src/services";
 
@@ -337,7 +347,7 @@ describe("access and analytics safeguards", () => {
     assert.equal(serializedSummary.includes("hiddenVerificationDetail"), false);
   });
 
-  test("removed person-attached QR concepts do not remain in active source or docs", async () => {
+  test("removed QR identity concepts do not remain in active source or docs", async () => {
     const filesToScan = [
       "AGENTS.md",
       "PRODUCT_SPEC.md",
@@ -375,6 +385,56 @@ describe("access and analytics safeguards", () => {
         );
       }
     }
+  });
+});
+
+describe("guided demo orchestration", () => {
+  test("progresses through guided demo state", () => {
+    const initialState = createInitialGuidedDemoState();
+    const afterPoint = advanceGuidedDemoStep(initialState, "view-rp014");
+    const afterMissingReport = advanceGuidedDemoStep(afterPoint, "report-missing-child");
+
+    assert.equal(afterPoint.completedStepIds.includes("view-rp014"), true);
+    assert.equal(afterPoint.activeStepIndex, 1);
+    assert.equal(afterMissingReport.completedStepIds.includes("report-missing-child"), true);
+    assert.equal(afterMissingReport.activeStepIndex, 2);
+  });
+
+  test("blocks final handover and item release in degraded connectivity", () => {
+    const degradedState = setGuidedDemoConnectivity(createInitialGuidedDemoState(), "degraded");
+
+    assert.throws(() => completePersonHandoverRuntime(degradedState), /degraded/);
+    assert.throws(() => completeItemReleaseRuntime(degradedState), /degraded/);
+  });
+
+  test("queues offline report only while degraded", () => {
+    const stableState = createInitialGuidedDemoState();
+    const unchanged = queueOfflineDemoReport(stableState);
+    const degradedState = setGuidedDemoConnectivity(stableState, "degraded");
+    const queued = queueOfflineDemoReport(degradedState);
+
+    assert.equal(unchanged.offlineQueuedReports, 0);
+    assert.equal(queued.offlineQueuedReports, 1);
+    assert.equal(queued.completedStepIds.includes("queue-offline-report"), true);
+  });
+
+  test("reset demo scenario restores baseline", () => {
+    const modifiedState = completePersonHandoverRuntime(createInitialGuidedDemoState());
+    const resetState = resetGuidedDemoScenario();
+
+    assert.equal(modifiedState.personHandoverCompleted, true);
+    assert.deepEqual(resetState, createInitialGuidedDemoState());
+  });
+
+  test("Phase 2A snapshot keeps leadership view aggregate-only", async () => {
+    const snapshot = await getDemoScenarioSnapshot();
+    const serialized = JSON.stringify(snapshot.leadershipAnalytics);
+
+    assert.equal(snapshot.leadershipAnalytics.view, "leadership_aggregate");
+    assert.equal(snapshot.leadershipAnalytics.sensitiveCaseDetailsIncluded, false);
+    assert.equal(serialized.includes("hiddenVerificationDetail"), false);
+    assert.equal(serialized.includes("sensitiveNotes"), false);
+    assert.equal(serialized.includes("person_looking_child_open"), false);
   });
 });
 

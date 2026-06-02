@@ -30,7 +30,7 @@ Status: superseded by Phase 1B concept alignment after validation.
 Scope:
 
 - Align ReuniteRC with the Reunite Point recovery model.
-- Remove person-attached QR identity concepts from the active prototype direction.
+- Remove discarded QR identity concepts from the active prototype direction.
 - Add `ReunitePoint`, `PersonCase`, `ItemCase`, `PersonMatchRecommendation`, `ItemMatchRecommendation`, `PersonHandoverRecord` and `ItemReleaseRecord`.
 - Split matching into Person Match Engine and Item Match Engine.
 - Add proof-of-ownership verification before item release.
@@ -57,10 +57,12 @@ Status: implemented in the Phase 1B kernel.
 Scope:
 
 - Build premium command-centre layout.
-- Add simulated role selector.
 - Add `/dashboard` with event status, metrics, recent activity, hotspots, urgent cases and connectivity status.
 - Show Reunite Point context and pending offline reports.
 - Add loading, empty and error states.
+- Add guided Congress Night demo flow.
+- Add Reunite Point poster previews.
+- Add report, match, handover, item release, PA fallback and leadership routes.
 
 Acceptance criteria:
 
@@ -69,6 +71,10 @@ Acceptance criteria:
 - Coordinator sees operational panels.
 - Connectivity status is visible.
 - No sensitive public data is exposed.
+- Degraded connectivity blocks final reunion and item release in the prototype.
+- Reset Demo restores baseline runtime state.
+
+Status: completed as the Phase 2A guided prototype experience.
 
 ## Phase 2B: Public And Staff Report Capture
 

@@ -12,6 +12,7 @@
   },
   "include": [
     "src/domain/**/*.ts",
+    "src/demo/**/*.ts",
     "src/repositories/**/*.ts",
     "src/services/**/*.ts",
     "tests/**/*.ts"

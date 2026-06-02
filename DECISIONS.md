@@ -54,6 +54,18 @@ Phase 1B implements the Reunite Point alignment kernel:
 - Person handover requires Information Bureau verification.
 - Demo data remains fictional.
 
+## Phase 2A UI Decisions
+
+- The strongest screen is `/demo`, a guided Congress Night 2026 simulation with a top progress timeline.
+- Reusable components are used for shell, event status, connectivity, Reunite Point posters, metrics, badges, match cards, verification checklists, PA queue, offline queue, activity timeline and leadership analytics.
+- The visual language uses dark graphite surfaces, cyan/teal active operations, amber pending states, restrained red for urgent unresolved cases and emerald for resolved outcomes.
+- Report forms demonstrate the four final report intents and Reunite Point context without creating public access to matches or sensitive details.
+- Poster previews show ReuniteRC branding, Point Code, location, short URL, QR rendering, fallback instruction and tamper-check guidance.
+- Guided demo state is stored locally in the browser and can be reset to the baseline scenario.
+- UI closure controls mirror the Phase 1B service rules: degraded connectivity blocks final person reunion and item release.
+- The leadership route renders aggregate metrics only.
+- No deployment is performed in Phase 2A.
+
 ## Remaining Decisions Before Supabase Integration
 
 - Exact RLS policy SQL for Reunite Point-scoped volunteer case visibility.

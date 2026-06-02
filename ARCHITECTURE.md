@@ -182,3 +182,33 @@ Phase 1B aligns the typed domain and service kernel with the Reunite Point recov
 - rule-based Item Match Engine with transparent scoring reasons;
 - service-layer dashboard aggregation for operational and leadership views;
 - unit tests for permissions, state transitions, handover safety, item release safety, match scoring, PA escalation, offline sync and aggregate analytics.
+
+## Phase 2A UI Runtime
+
+Phase 2A adds a front-end prototype around the Phase 1B kernel without introducing live persistence.
+
+Runtime notes:
+
+- Route pages load fictional demo data through `getDemoScenarioSnapshot`.
+- The snapshot uses `createDemoSafetyKernel`, repository interfaces and service methods rather than duplicating domain rules in React.
+- The guided demo uses a small client runtime state module for step progression, connectivity toggle, offline queue count, handover completion, item release completion and reset.
+- Runtime state is stored in `localStorage` for the browser session and can be restored to baseline with Reset Demo.
+- Person and item match review pages use the Phase 1B rule-based engines through service calls.
+- Verified handover and item release pages demonstrate the online-only closure boundary in client UI while tests preserve the service-level guard.
+- Leadership analytics render only aggregate fields from the service summary.
+- The UI remains a prototype shell; production persistence and authenticated mutations remain part of later Supabase integration.
+
+Phase 2A routes:
+
+- `/`
+- `/demo`
+- `/reunite-points`
+- `/report/person`
+- `/report/item`
+- `/matches/person`
+- `/matches/item`
+- `/handover/person/[id]`
+- `/release/item/[id]`
+- `/announcements`
+- `/dashboard`
+- `/analytics`
