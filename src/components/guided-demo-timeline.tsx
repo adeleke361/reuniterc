@@ -12,7 +12,7 @@ export function GuidedDemoTimeline({ state }: GuidedDemoTimelineProps) {
   const completed = new Set(state?.completedStepIds ?? []);
 
   return (
-    <section className="border border-border bg-panel/85 p-4">
+    <section className="border border-blue-900/45 bg-[#071426]/90 p-4 shadow-[0_20px_60px_rgba(7,20,43,0.25)]">
       <div className="grid gap-3 md:grid-cols-5">
         {guidedDemoSteps.map((step, index) => {
           const done = completed.has(step.id);
@@ -21,10 +21,10 @@ export function GuidedDemoTimeline({ state }: GuidedDemoTimelineProps) {
           const Icon = done ? CheckCircle2 : CircleDot;
           const className = `min-h-[112px] border p-3 transition ${
             active
-              ? "border-cyan bg-cyan/10 text-foreground"
+              ? "border-amber-300/60 bg-amber-200/10 text-white"
               : done
-                ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-100"
-                : "border-border bg-panel-strong/70 text-muted"
+                ? "border-green-300/40 bg-green-300/10 text-green-100"
+                : "border-white/10 bg-white/[0.04] text-blue-100/65"
           }`;
           const content = (
             <>
@@ -51,7 +51,7 @@ export function GuidedDemoTimeline({ state }: GuidedDemoTimelineProps) {
             <Link
               key={step.id}
               href={step.route as Route}
-              className={`${className} hover:border-cyan/40 hover:text-foreground`}
+              className={`${className} hover:border-amber-200/55 hover:text-white`}
             >
               {content}
             </Link>

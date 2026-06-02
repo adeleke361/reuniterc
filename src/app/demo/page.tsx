@@ -8,8 +8,8 @@ export default async function DemoPage() {
   return (
     <AppShell
       eyebrow="Guided simulation"
-      title="Congress Night 2026 recovery flow"
-      subtitle="Run the Arena Rear RP-014 story from report capture through rule-based match review, verified reunion, item release, offline queueing, PA fallback and leadership analytics."
+      title="Arena Rear care flow"
+      subtitle="Walk through one fictional Information Bureau incident with calm reporting, transparent review, verified handover, item release, offline queueing, PA fallback and aggregate leadership outcome."
     >
       <DemoControlPanel snapshot={snapshot} />
     </AppShell>

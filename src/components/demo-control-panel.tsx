@@ -58,12 +58,12 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
       <GuidedDemoTimeline state={state} />
 
       <section className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-        <article className="border border-border bg-panel/90 p-6 shadow-command-glow">
+        <article className="border border-blue-900/50 bg-[#071426]/95 p-6 shadow-[0_24px_70px_rgba(7,20,43,0.35)]">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Current step</p>
-              <h2 className="mt-2 text-3xl font-semibold">{currentStep?.label}</h2>
-              <p className="mt-3 max-w-2xl leading-7 text-muted">{currentStep?.summary}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">Information Bureau desk step</p>
+              <h2 className="mt-2 text-3xl font-semibold text-white">{currentStep?.label}</h2>
+              <p className="mt-3 max-w-2xl leading-7 text-blue-100/75">{currentStep?.summary}</p>
             </div>
             <ConnectivityBadge status={state.connectivityStatus} />
           </div>
@@ -73,7 +73,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
               <StagePanel
                 icon={MapPinned}
                 title={`${arenaPoint.code} ${arenaPoint.zone}`}
-                body={`${arenaPoint.name} is the official reporting point for this demo. The printed Point Code remains useful if the QR form cannot load.`}
+                body={`${arenaPoint.name} is the official reporting point for this fictional demo. Families and volunteers can still read out the printed Point Code if the QR form cannot load.`}
                 actionLabel="Confirm RP-014 viewed"
                 onAction={() => completeStep("ready-rp014")}
                 href="/reunite-points"
@@ -83,7 +83,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             {currentStep?.id === "missing-child-reported" && missingCase && (
               <CaseStage
                 title="Missing child reported"
-                body="A parent or group leader has submitted a fictional looking-for-person report from Arena Rear."
+                body="A parent or group leader has calmly submitted a fictional looking-for-person report from Arena Rear."
                 status={missingCase.status}
                 urgency={missingCase.urgency}
                 location={missingCase.lastSeenOrFoundLocation}
@@ -95,7 +95,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             {currentStep?.id === "found-child-reported" && foundCase && (
               <CaseStage
                 title="Found child reported from RP-014"
-                body="A volunteer has filed a fictional found-person report from the same Reunite Point."
+                body="A volunteer has filed a fictional found-person report from the same Reunite Point, keeping the child with authorised support."
                 status={foundCase.status}
                 urgency={foundCase.urgency}
                 location={foundCase.lastSeenOrFoundLocation}
@@ -120,7 +120,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                 <button
                   type="button"
                   onClick={() => completeStep("person-match-recommended")}
-                  className="inline-flex items-center gap-2 rounded-md bg-cyan px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
+                  className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-blue-950 transition hover:bg-amber-100"
                 >
                   Send to verification
                   <ArrowRight className="size-4" aria-hidden="true" />
@@ -143,7 +143,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
               <OutcomeStage
                 icon={CheckCircle2}
                 title="Safely Reunited"
-                body="Verified handover is complete. The person case can now be counted as safely reunited."
+                body="Verified handover is complete. The fictional person case can now be counted as safely reunited."
                 actionLabel="Run lost-and-found item match"
                 onAction={() => completeStep("safely-reunited")}
               />
@@ -165,7 +165,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                 <button
                   type="button"
                   onClick={() => completeStep("item-match-recommended")}
-                  className="inline-flex items-center gap-2 rounded-md bg-cyan px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
+                  className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-blue-950 transition hover:bg-amber-100"
                 >
                   Move to proof check
                   <ArrowRight className="size-4" aria-hidden="true" />
@@ -177,7 +177,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
               <StagePanel
                 icon={PackageCheck}
                 title="Proof-of-ownership item release"
-                body="The item stays held until proof details are checked and release notes are captured."
+                body="The item stays held with staff until proof details are checked and release notes are captured."
                 actionLabel="Complete item release"
                 onAction={completeItemRelease}
                 href="/release/item/item_match_demo"
@@ -193,10 +193,10 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                     body="Proof of ownership has been verified, so the item release can be recorded."
                   />
                 )}
-                <section className="border border-amber/35 bg-amber/10 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-soft">Low-connectivity test</p>
-                  <h3 className="mt-2 text-2xl font-semibold">Queue a staff report offline</h3>
-                  <p className="mt-3 leading-7 text-muted">
+                <section className="border border-amber-300/45 bg-amber-200/10 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">Low-connectivity test</p>
+                  <h3 className="mt-2 text-2xl font-semibold text-white">Queue a staff report offline</h3>
+                  <p className="mt-3 leading-7 text-blue-100/75">
                     Authorised staff who already loaded the app can queue reports while degraded. Match confirmation,
                     person handover and item release stay blocked until connectivity is stable.
                   </p>
@@ -206,7 +206,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                       type="button"
                       onClick={queueOfflineReport}
                       disabled={state.connectivityStatus !== "degraded"}
-                      className="inline-flex items-center justify-center gap-2 rounded-md bg-amber px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-soft disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 rounded-md bg-amber-200 px-4 py-2 text-sm font-semibold text-blue-950 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <WifiOff className="size-4" aria-hidden="true" />
                       Queue offline report
@@ -220,7 +220,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
               <StagePanel
                 icon={ClipboardCheck}
                 title="Leadership outcome"
-                body="Leadership receives aggregate-only insight and an operational recommendation for Arena Rear coverage."
+                body="Leadership receives aggregate-only insight and an operational recommendation for Arena Rear volunteer coverage."
                 actionLabel="Open leadership analytics"
                 onAction={() => completeStep("leadership-outcome")}
                 href="/analytics"
@@ -233,15 +233,15 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
           </div>
         </article>
 
-        <article className="border border-border bg-panel/90 p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Demo promise</p>
-          <h2 className="mt-2 text-2xl font-semibold">
+        <article className="border border-red-300/25 bg-[#100b14]/85 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-200">Care promise</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">
             No one should get lost in the crowd. No case should get lost in the process.
           </h2>
-          <p className="mt-4 text-sm leading-6 text-muted">
-            This guided sequence uses fictional demo data and the Phase 1B service kernel.
+          <p className="mt-4 text-sm leading-6 text-blue-100/75">
+            This guided sequence uses fictional demo data to show how a trusted Information Bureau workflow can be supported with structure and care.
           </p>
-          <div className="mt-5 space-y-3 text-sm text-muted">
+          <div className="mt-5 space-y-3 text-sm text-blue-100/70">
             <p>Online mode: scan a Reunite Point and submit digitally.</p>
             <p>Staff offline mode: queue reports after the app has already loaded.</p>
             <p>No-internet fallback: report the printed Point Code to official staff.</p>
@@ -289,15 +289,15 @@ interface StagePanelProps {
 
 function StagePanel({ icon: Icon, title, body, actionLabel, onAction, href }: StagePanelProps) {
   return (
-    <section className="border border-cyan/35 bg-cyan/10 p-5">
-      <Icon className="size-6 text-cyan" aria-hidden="true" />
-      <h3 className="mt-3 text-2xl font-semibold">{title}</h3>
-      <p className="mt-3 max-w-2xl leading-7 text-muted">{body}</p>
+    <section className="border border-blue-400/25 bg-white/[0.05] p-5">
+      <Icon className="size-6 text-amber-200" aria-hidden="true" />
+      <h3 className="mt-3 text-2xl font-semibold text-white">{title}</h3>
+      <p className="mt-3 max-w-2xl leading-7 text-blue-100/75">{body}</p>
       <div className="mt-5 flex flex-wrap gap-3">
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex items-center gap-2 rounded-md bg-cyan px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
+          className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-blue-950 transition hover:bg-amber-100"
         >
           {actionLabel}
           <ArrowRight className="size-4" aria-hidden="true" />
@@ -305,7 +305,7 @@ function StagePanel({ icon: Icon, title, body, actionLabel, onAction, href }: St
         {href && (
           <Link
             href={href as Route}
-            className="rounded-md border border-cyan/35 px-4 py-2 text-sm font-semibold text-cyan transition hover:bg-cyan/10"
+            className="rounded-md border border-white/25 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
           >
             Open route
           </Link>
@@ -327,18 +327,18 @@ interface CaseStageProps {
 
 function CaseStage({ title, body, status, urgency, location, actionLabel, onAction }: CaseStageProps) {
   return (
-    <section className="border border-border bg-panel-strong p-5">
+    <section className="border border-white/10 bg-white/[0.045] p-5">
       <div className="flex flex-wrap gap-2">
         <CaseStatusBadge status={status} />
         <PriorityBadge urgency={urgency} />
       </div>
-      <h3 className="mt-4 text-2xl font-semibold">{title}</h3>
-      <p className="mt-3 leading-7 text-muted">{body}</p>
-      <p className="mt-3 text-sm font-semibold text-cyan">{location}</p>
+      <h3 className="mt-4 text-2xl font-semibold text-white">{title}</h3>
+      <p className="mt-3 leading-7 text-blue-100/75">{body}</p>
+      <p className="mt-3 text-sm font-semibold text-amber-200">{location}</p>
       <button
         type="button"
         onClick={onAction}
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-cyan px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
+        className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-blue-950 transition hover:bg-amber-100"
       >
         {actionLabel}
         <ArrowRight className="size-4" aria-hidden="true" />
@@ -357,14 +357,14 @@ interface OutcomeStageProps {
 
 function OutcomeStage({ icon: Icon, title, body, actionLabel, onAction }: OutcomeStageProps) {
   return (
-    <section className="border border-emerald-400/35 bg-emerald-400/10 p-6">
-      <Icon className="size-7 text-emerald-300" aria-hidden="true" />
-      <h3 className="mt-3 text-3xl font-semibold">{title}</h3>
-      <p className="mt-3 max-w-2xl leading-7 text-muted">{body}</p>
+    <section className="border border-green-300/40 bg-green-300/10 p-6">
+      <Icon className="size-7 text-green-300" aria-hidden="true" />
+      <h3 className="mt-3 text-3xl font-semibold text-white">{title}</h3>
+      <p className="mt-3 max-w-2xl leading-7 text-blue-100/75">{body}</p>
       <button
         type="button"
         onClick={onAction}
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+        className="mt-5 inline-flex items-center gap-2 rounded-md bg-green-300 px-4 py-2 text-sm font-semibold text-green-950 transition hover:bg-green-200"
       >
         {actionLabel}
         <ArrowRight className="size-4" aria-hidden="true" />
@@ -381,10 +381,10 @@ interface OutcomeNoticeProps {
 
 function OutcomeNotice({ icon: Icon, title, body }: OutcomeNoticeProps) {
   return (
-    <section className="border border-emerald-400/35 bg-emerald-400/10 p-5">
-      <Icon className="size-6 text-emerald-300" aria-hidden="true" />
-      <h3 className="mt-3 text-2xl font-semibold">{title}</h3>
-      <p className="mt-3 max-w-2xl leading-7 text-muted">{body}</p>
+    <section className="border border-green-300/40 bg-green-300/10 p-5">
+      <Icon className="size-6 text-green-300" aria-hidden="true" />
+      <h3 className="mt-3 text-2xl font-semibold text-white">{title}</h3>
+      <p className="mt-3 max-w-2xl leading-7 text-blue-100/75">{body}</p>
     </section>
   );
 }
@@ -398,13 +398,13 @@ interface CaseSummaryProps {
 
 function CaseSummary({ title, location, status, urgency }: CaseSummaryProps) {
   return (
-    <article className="border border-border bg-panel/90 p-5">
+    <article className="border border-blue-900/45 bg-[#071426]/90 p-5">
       <div className="flex flex-wrap gap-2">
         <CaseStatusBadge status={status} />
         <PriorityBadge urgency={urgency} />
       </div>
-      <h3 className="mt-4 text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-muted">{location}</p>
+      <h3 className="mt-4 text-xl font-semibold text-white">{title}</h3>
+      <p className="mt-2 text-sm text-blue-100/70">{location}</p>
     </article>
   );
 }

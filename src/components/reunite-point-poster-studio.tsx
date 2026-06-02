@@ -63,14 +63,14 @@ export function ReunitePointPosterStudio({ points }: ReunitePointPosterStudioPro
 
   return (
     <div className="space-y-7">
-      <section className="no-print border border-border bg-panel/90 p-5">
+      <section className="no-print border border-blue-900/45 bg-[#071426]/95 p-5">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-muted">Selected Reunite Point</span>
+            <span className="text-sm font-semibold text-blue-100/75">Selected Reunite Point</span>
             <select
               value={selectedPoint.id}
               onChange={(event) => setSelectedPointId(event.target.value)}
-              className="w-full border border-border bg-panel-strong px-3 py-3 text-foreground outline-none focus:border-cyan"
+              className="w-full border border-white/15 bg-[#0b1d3a] px-3 py-3 text-white outline-none focus:border-amber-200"
             >
               {points.map((point) => (
                 <option key={point.id} value={point.id}>
@@ -83,7 +83,7 @@ export function ReunitePointPosterStudio({ points }: ReunitePointPosterStudioPro
             <button
               type="button"
               onClick={printSelectedPoster}
-              className="inline-flex items-center gap-2 rounded-md bg-cyan px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
+              className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-blue-950 transition hover:bg-amber-100"
             >
               <Printer className="size-4" aria-hidden="true" />
               Print selected poster
@@ -91,7 +91,7 @@ export function ReunitePointPosterStudio({ points }: ReunitePointPosterStudioPro
             <button
               type="button"
               onClick={downloadSelectedPosterPng}
-              className="inline-flex items-center gap-2 rounded-md border border-cyan/35 px-4 py-2 text-sm font-semibold text-cyan transition hover:bg-cyan/10"
+              className="inline-flex items-center gap-2 rounded-md border border-white/25 px-4 py-2 text-sm font-semibold text-white transition hover:border-amber-200 hover:bg-white/10"
             >
               <Download className="size-4" aria-hidden="true" />
               Download selected PNG
@@ -99,7 +99,7 @@ export function ReunitePointPosterStudio({ points }: ReunitePointPosterStudioPro
             <button
               type="button"
               onClick={copyShortUrl}
-              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-muted transition hover:border-cyan/35 hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-blue-100/75 transition hover:border-red-300 hover:text-white"
             >
               <Clipboard className="size-4" aria-hidden="true" />
               {copyState === "copied" ? "Copied" : "Copy short URL"}
@@ -107,7 +107,7 @@ export function ReunitePointPosterStudio({ points }: ReunitePointPosterStudioPro
             <button
               type="button"
               onClick={printAllPosters}
-              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-muted transition hover:border-cyan/35 hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-blue-100/75 transition hover:border-red-300 hover:text-white"
             >
               <Printer className="size-4" aria-hidden="true" />
               Print all posters
@@ -136,24 +136,33 @@ async function downloadPosterPng(point: ReunitePoint, qrSvg: SVGElement) {
     return;
   }
 
-  context.fillStyle = "#f5fbfb";
+  context.fillStyle = "#ffffff";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.strokeStyle = "#061416";
+  context.fillStyle = "#0b2d63";
+  context.fillRect(42, 42, canvas.width - 84, 165);
+  context.fillStyle = "#b91c1c";
+  context.fillRect(42, 207, canvas.width - 84, 18);
+  context.fillStyle = "#f8fafc";
+  context.fillRect(470, 207, 440, 18);
+  context.strokeStyle = "#0b2d63";
   context.lineWidth = 14;
   context.strokeRect(42, 42, canvas.width - 84, canvas.height - 84);
 
-  drawText(context, "ReuniteRC", 92, 160, "700 72px Arial", "#061416");
-  drawText(context, "OFFICIAL REUNITE POINT", 92, 225, "700 28px Arial", "#0891b2");
-  drawText(context, point.name, 92, 330, "800 64px Arial", "#061416", 820, 76);
-  drawText(context, point.locationLabel, 92, 450, "700 34px Arial", "#334155", 820, 44);
+  drawText(context, "ReuniteRC", 92, 145, "700 72px Arial", "#ffffff");
+  drawText(context, "INFORMATION BUREAU SUPPORT LAYER", 92, 190, "700 24px Arial", "#fde68a");
+  drawText(context, "OFFICIAL REUNITE POINT", 92, 305, "700 28px Arial", "#b91c1c");
+  drawText(context, point.name, 92, 410, "800 64px Arial", "#0b2d63", 820, 76);
+  drawText(context, point.locationLabel, 92, 530, "700 34px Arial", "#334155", 820, 44);
 
-  context.strokeStyle = "#061416";
+  context.fillStyle = "#b91c1c";
+  context.fillRect(1010, 270, 265, 170);
+  context.strokeStyle = "#b91c1c";
   context.lineWidth = 8;
-  context.strokeRect(1010, 118, 265, 170);
-  drawText(context, "POINT CODE", 1048, 178, "800 28px Arial", "#061416");
-  drawText(context, point.code, 1050, 250, "900 64px Arial", "#061416");
+  context.strokeRect(1010, 270, 265, 170);
+  drawText(context, "POINT CODE", 1048, 330, "800 28px Arial", "#ffffff");
+  drawText(context, point.code, 1050, 402, "900 64px Arial", "#ffffff");
 
-  context.strokeStyle = "#061416";
+  context.strokeStyle = "#0b2d63";
   context.lineWidth = 10;
   context.strokeRect(92, 560, 430, 430);
   context.fillStyle = "#ffffff";
@@ -162,7 +171,7 @@ async function downloadPosterPng(point: ReunitePoint, qrSvg: SVGElement) {
   context.drawImage(qrImage, 142, 610, 330, 330);
 
   drawText(context, "SCAN TO REPORT", 580, 620, "800 28px Arial", "#64748b");
-  drawText(context, point.officialShortUrl, 580, 705, "900 50px Arial", "#061416", 690, 58);
+  drawText(context, point.officialShortUrl, 580, 705, "900 50px Arial", "#0b2d63", 690, 58);
 
   drawPanel(
     context,
@@ -170,8 +179,8 @@ async function downloadPosterPng(point: ReunitePoint, qrSvg: SVGElement) {
     1080,
     1216,
     270,
-    "#ecfeff",
-    "#67e8f9",
+    "#eff6ff",
+    "#0b2d63",
     "NO-INTERNET FALLBACK",
     point.fallbackInstruction
   );
@@ -182,7 +191,7 @@ async function downloadPosterPng(point: ReunitePoint, qrSvg: SVGElement) {
     1216,
     290,
     "#fffbeb",
-    "#f59e0b",
+    "#b91c1c",
     "TAMPER CHECK",
     point.tamperCheckInstruction
   );
@@ -193,7 +202,7 @@ async function downloadPosterPng(point: ReunitePoint, qrSvg: SVGElement) {
     92,
     1800,
     "700 30px Arial",
-    "#0f766e",
+    "#166534",
     1160,
     38
   );
