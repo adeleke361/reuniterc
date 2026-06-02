@@ -9,15 +9,15 @@ export default function Home() {
           ReuniteRC
         </h1>
         <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">
-          Offline-resilient digital operations support for the trusted Information Bureau family
-          reunification workflow at major Redemption City programmes.
+          Digital reunification and lost-and-found operations support for the trusted Information
+          Bureau workflow at major Redemption City programmes.
         </p>
         <div className="mt-8 grid gap-3 text-sm text-muted sm:grid-cols-3">
           <div className="border border-border bg-panel-strong p-4">
-            Structured case capture
+            Reunite Point reporting
           </div>
           <div className="border border-border bg-panel-strong p-4">
-            Verified guardian handover
+            Verified handover and release
           </div>
           <div className="border border-border bg-panel-strong p-4">
             Offline queue architecture

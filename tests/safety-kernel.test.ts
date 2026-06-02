@@ -1,210 +1,388 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { describe, test } from "node:test";
 import {
-  assertCaseTransition,
+  assertItemCaseTransition,
+  assertItemReleasedRequiresReleaseRecord,
+  assertPersonCaseTransition,
   assertSafelyReunitedRequiresHandover,
-  canTransitionCaseStatus,
+  canTransitionItemCaseStatus,
+  canTransitionPersonCaseStatus,
   DomainRuleError,
-  hasPermission,
-  scorePotentialMatch
+  hasPermission
 } from "../src/domain";
 import { DEMO_EVENT_ID } from "../src/repositories/demo/seed-data";
 import { createDemoSafetyKernel } from "../src/services";
 
 describe("role permissions", () => {
-  test("enforces role-specific safety controls", () => {
+  test("enforces Phase 1B role-specific controls", () => {
     assert.equal(hasPermission("information_bureau_coordinator", "match:confirm"), true);
-    assert.equal(hasPermission("information_bureau_coordinator", "handover:verify_complete"), true);
+    assert.equal(hasPermission("information_bureau_coordinator", "person_handover:complete"), true);
+    assert.equal(hasPermission("information_bureau_coordinator", "item_release:complete"), true);
     assert.equal(hasPermission("information_bureau_coordinator", "announcement:escalate"), true);
 
-    assert.equal(hasPermission("helppoint_volunteer", "case:create_missing"), true);
-    assert.equal(hasPermission("helppoint_volunteer", "safecard:lookup"), true);
+    assert.equal(hasPermission("helppoint_volunteer", "person_report:create_looking"), true);
+    assert.equal(hasPermission("helppoint_volunteer", "item_report:create_found"), true);
     assert.equal(hasPermission("helppoint_volunteer", "match:confirm"), false);
-    assert.equal(hasPermission("helppoint_volunteer", "handover:verify_complete"), false);
+    assert.equal(hasPermission("helppoint_volunteer", "item_release:complete"), false);
 
     assert.equal(hasPermission("leadership_viewer", "dashboard:view_leadership_aggregate"), true);
     assert.equal(hasPermission("leadership_viewer", "case:view_sensitive"), false);
 
-    assert.equal(hasPermission("guardian_group_leader", "safecard:register"), true);
-    assert.equal(hasPermission("guardian_group_leader", "dashboard:view_operations"), false);
+    assert.equal(hasPermission("public_reporter", "person_report:create_looking"), true);
+    assert.equal(hasPermission("public_reporter", "item_report:create_lost"), true);
+    assert.equal(hasPermission("public_reporter", "dashboard:view_operations"), false);
   });
 });
 
-describe("case workflow state machine", () => {
-  test("allows valid transitions and rejects unsafe closure", () => {
+describe("person and item workflow state machines", () => {
+  test("allow valid transitions and reject unsafe final closure", () => {
     assert.equal(
-      canTransitionCaseStatus("pending_sync", "reported", { syncCompleted: true }),
+      canTransitionPersonCaseStatus("pending_sync", "report_created", { syncCompleted: true }),
       true
     );
     assert.equal(
-      canTransitionCaseStatus("reported", "under_review", { coordinatorReviewed: true }),
+      canTransitionPersonCaseStatus("report_created", "possible_match_suggested", {
+        matchSuggested: true
+      }),
       true
     );
     assert.equal(
-      canTransitionCaseStatus("under_review", "match_pending_handover", {
+      canTransitionPersonCaseStatus("possible_match_suggested", "match_confirmed_by_information_bureau", {
         matchConfirmed: true
       }),
       true
     );
     assert.equal(
-      canTransitionCaseStatus("match_pending_handover", "safely_reunited", {
+      canTransitionPersonCaseStatus("match_confirmed_by_information_bureau", "verified_handover_completed", {
         hasVerifiedHandover: true
       }),
       true
     );
-
     assert.equal(
-      canTransitionCaseStatus("reported", "safely_reunited", { hasVerifiedHandover: true }),
+      canTransitionPersonCaseStatus("verified_handover_completed", "safely_reunited", {
+        hasVerifiedHandover: true
+      }),
+      true
+    );
+    assert.equal(
+      canTransitionPersonCaseStatus("report_created", "safely_reunited", { hasVerifiedHandover: true }),
       false
     );
     assert.throws(
-      () => assertCaseTransition("match_pending_handover", "safely_reunited"),
+      () => assertPersonCaseTransition("verified_handover_completed", "safely_reunited"),
+      DomainRuleError
+    );
+
+    assert.equal(
+      canTransitionItemCaseStatus("pending_sync", "report_created", { syncCompleted: true }),
+      true
+    );
+    assert.equal(
+      canTransitionItemCaseStatus("possible_match_suggested", "match_confirmed_by_information_bureau", {
+        matchConfirmed: true
+      }),
+      true
+    );
+    assert.equal(
+      canTransitionItemCaseStatus("match_confirmed_by_information_bureau", "proof_of_ownership_verified", {
+        hasProofOfOwnership: true
+      }),
+      true
+    );
+    assert.equal(
+      canTransitionItemCaseStatus("proof_of_ownership_verified", "item_released", {
+        hasProofOfOwnership: true
+      }),
+      true
+    );
+    assert.throws(
+      () => assertItemCaseTransition("proof_of_ownership_verified", "item_released"),
       DomainRuleError
     );
   });
 
-  test("prohibits safely reunited status without a verified handover record", async () => {
+  test("requires verification records before final person reunion or item release", async () => {
     const { repositories } = createDemoSafetyKernel();
-    const completedCase = await repositories.cases.getById("case_missing_child_completed");
-    assert.ok(completedCase);
+    const completedPersonCase = await repositories.personCases.getById("person_looking_child_completed");
+    const completedItemCase = await repositories.itemCases.getById("item_found_bible_completed");
+    assert.ok(completedPersonCase);
+    assert.ok(completedItemCase);
 
     assert.throws(
-      () => assertSafelyReunitedRequiresHandover(completedCase),
+      () => assertSafelyReunitedRequiresHandover(completedPersonCase),
+      DomainRuleError
+    );
+    assert.throws(
+      () => assertItemReleasedRequiresReleaseRecord(completedItemCase),
       DomainRuleError
     );
   });
 });
 
-describe("assisted match engine", () => {
-  test("scores exact SafeCard-compatible cases as a strong recommendation", async () => {
+describe("rule-based match engines", () => {
+  test("scores Reunite Point location-aware person matches as strong recommendations", async () => {
     const { repositories, services } = createDemoSafetyKernel();
     const coordinator = await getActor(repositories, "staff_demo_coordinator");
 
-    const matches = await services.suggestMatches(coordinator, "case_missing_child_open");
-    const strongMatch = matches.find((match) => match.foundCaseId === "case_found_child_candidate");
+    const matches = await services.suggestPersonMatches(coordinator, "person_looking_child_open");
+    const strongMatch = matches.find((match) => match.foundCaseId === "person_found_child_candidate");
 
     assert.ok(strongMatch);
     assert.equal(strongMatch.tier, "strong_match_recommendation");
     assert.ok(strongMatch.score >= 80);
-    assert.ok(strongMatch.reasons.some((reason) => reason.code === "exact_safecard_token"));
-    assert.ok(
-      strongMatch.reasons.some((reason) =>
-        reason.label.includes("Human coordinator verification is required")
-      )
-    );
+    assert.ok(strongMatch.reasons.some((reason) => reason.code === "reunite_point_proximity"));
+    assert.ok(strongMatch.reasons.some((reason) => reason.code === "human_verification_required"));
   });
 
-  test("scores lower when SafeCard token compatibility is absent", async () => {
-    const { repositories } = createDemoSafetyKernel();
-    const missingCase = await repositories.cases.getById("case_missing_child_open");
-    const foundCase = await repositories.cases.getById("case_found_child_candidate");
-    const helpPoints = await repositories.helpPoints.listByEvent(DEMO_EVENT_ID);
-    assert.ok(missingCase);
-    assert.ok(foundCase);
+  test("scores Reunite Point location-aware item matches as strong recommendations", async () => {
+    const { repositories, services } = createDemoSafetyKernel();
+    const coordinator = await getActor(repositories, "staff_demo_coordinator");
 
-    const suggestion = scorePotentialMatch(
-      missingCase,
-      {
-        ...foundCase,
-        safetyCardId: undefined,
-        descriptionTags: ["blue-top"]
-      },
-      { helpPointsById: new Map(helpPoints.map((helpPoint) => [helpPoint.id, helpPoint])) }
-    );
+    const matches = await services.suggestItemMatches(coordinator, "item_lost_bag_open");
+    const strongMatch = matches.find((match) => match.foundItemCaseId === "item_found_bag_candidate");
 
-    assert.equal(suggestion.tier, "insufficient_confidence");
-    assert.ok(suggestion.score < 55);
-    assert.equal(
-      suggestion.reasons.some((reason) => reason.code === "exact_safecard_token"),
-      false
-    );
+    assert.ok(strongMatch);
+    assert.equal(strongMatch.tier, "strong_match_recommendation");
+    assert.ok(strongMatch.score >= 80);
+    assert.ok(strongMatch.reasons.some((reason) => reason.code === "reunite_point_proximity"));
+    assert.ok(strongMatch.reasons.some((reason) => reason.code === "proof_of_ownership_required"));
+    assert.ok(strongMatch.reasons.some((reason) => reason.code === "hidden_verification_detail" && reason.staffOnly));
   });
 });
 
 describe("PA escalation and offline safety", () => {
-  test("PA escalation does not close or resolve a case", async () => {
+  test("PA escalation does not close or resolve person or item cases", async () => {
     const { repositories, services } = createDemoSafetyKernel();
     const coordinator = await getActor(repositories, "staff_demo_coordinator");
-    const before = await repositories.cases.getById("case_missing_elder_pa");
-    assert.ok(before);
+    const personBefore = await repositories.personCases.getById("person_looking_elder_pa");
+    const itemBefore = await repositories.itemCases.getById("item_lost_bag_open");
+    assert.ok(personBefore);
+    assert.ok(itemBefore);
 
-    const escalation = await services.escalateForAnnouncement(coordinator, {
+    const personEscalation = await services.escalateForAnnouncement(coordinator, {
       eventId: DEMO_EVENT_ID,
-      caseId: before.id,
+      caseKind: "person_case",
+      caseId: personBefore.id,
       announcementText: "Fictional privacy-conscious PA escalation for test.",
       requestedAt: "2026-08-10T21:10:00Z"
     });
-    const after = await repositories.cases.getById(before.id);
+    const itemEscalation = await services.escalateForAnnouncement(coordinator, {
+      eventId: DEMO_EVENT_ID,
+      caseKind: "item_case",
+      caseId: itemBefore.id,
+      announcementText: "Fictional lost-item desk announcement for test.",
+      requestedAt: "2026-08-10T21:11:00Z"
+    });
+    const personAfter = await repositories.personCases.getById(personBefore.id);
+    const itemAfter = await repositories.itemCases.getById(itemBefore.id);
 
-    assert.equal(escalation.status, "queued");
-    assert.equal(after?.status, before.status);
-    assert.equal(after?.resolvedAt, undefined);
+    assert.equal(personEscalation.status, "queued");
+    assert.equal(itemEscalation.status, "queued");
+    assert.equal(personAfter?.status, personBefore.status);
+    assert.equal(itemAfter?.status, itemBefore.status);
+    assert.equal(personAfter?.resolvedAt, undefined);
+    assert.equal(itemAfter?.resolvedAt, undefined);
   });
 
-  test("offline reports stay pending until stable sync succeeds", async () => {
+  test("offline queued person and item reports remain pending until stable sync succeeds", async () => {
     const { repositories, services } = createDemoSafetyKernel();
-    const volunteer = await getActor(repositories, "staff_demo_volunteer_b");
+    const volunteer = await getActor(repositories, "staff_demo_volunteer_arena");
 
-    const queued = await services.queueOfflineOperation(volunteer, {
+    const queuedPerson = await services.queueOfflineReport(volunteer, {
       eventId: DEMO_EVENT_ID,
-      clientOperationId: "offline-client-test-001",
-      operationType: "create_found_case",
+      clientOperationId: "offline-client-test-person-001",
+      operationType: "create_found_person_report",
       payload: {
-        caseType: "found",
+        caseIntent: "found_person",
         eventId: DEMO_EVENT_ID,
-        helpPointId: "hp_b_arena_rear",
+        reportSourcePointId: "point_arena_rear",
         personCategory: "group_member",
-        approxAgeBand: "18-59",
+        approximateAgeBand: "18-59",
         reportedAt: "2026-08-10T21:02:00Z",
-        foundLocation: "HelpPoint B near Arena Rear",
-        descriptionTags: ["group-badge", "demo-test"],
-        sensitiveNotes: "Fictional offline found report for test.",
+        lastSeenOrFoundLocation: "Arena Rear volunteer desk",
+        groupOrChurchReference: "Fictional Youth Team C",
+        nonSensitiveDescriptionTags: ["group-badge", "demo-test"],
+        sensitiveNotes: "Fictional offline found-person report for test.",
         urgency: "standard"
       }
     });
-    assert.equal(queued.status, "pending");
-    assert.ok(queued.localEntityId);
+    const queuedItem = await services.queueOfflineReport(volunteer, {
+      eventId: DEMO_EVENT_ID,
+      clientOperationId: "offline-client-test-item-001",
+      operationType: "create_found_item_report",
+      payload: {
+        itemIntent: "found_item",
+        eventId: DEMO_EVENT_ID,
+        reportSourcePointId: "point_arena_rear",
+        itemCategory: "wallet",
+        itemColorOrDescriptionTags: ["brown-wallet", "small"],
+        reportedAt: "2026-08-10T21:03:00Z",
+        lastSeenOrFoundLocation: "Arena Rear volunteer desk",
+        hiddenVerificationDetail: "Fictional card-slot detail",
+        urgency: "standard"
+      }
+    });
 
-    const pendingCase = await repositories.cases.getById(queued.localEntityId);
-    assert.equal(pendingCase?.status, "pending_sync");
+    assert.equal(queuedPerson.status, "pending");
+    assert.equal(queuedItem.status, "pending");
+    assert.ok(queuedPerson.localEntityId);
+    assert.ok(queuedItem.localEntityId);
+    assert.equal((await repositories.personCases.getById(queuedPerson.localEntityId))?.status, "pending_sync");
+    assert.equal((await repositories.itemCases.getById(queuedItem.localEntityId))?.status, "pending_sync");
 
-    const degradedResult = await services.syncOfflineOperations(volunteer, DEMO_EVENT_ID, "degraded");
+    const degradedResult = await services.syncOfflineReports(volunteer, DEMO_EVENT_ID, "degraded");
     assert.equal(degradedResult.synced.length, 0);
-    assert.ok(degradedResult.remainingPending.some((operation) => operation.id === queued.id));
+    assert.ok(degradedResult.remainingPending.some((operation) => operation.id === queuedPerson.id));
+    assert.ok(degradedResult.remainingPending.some((operation) => operation.id === queuedItem.id));
 
-    const stableResult = await services.syncOfflineOperations(volunteer, DEMO_EVENT_ID, "stable");
-    const syncedQueued = stableResult.synced.find((operation) => operation.id === queued.id);
-    assert.ok(syncedQueued);
-    assert.equal(syncedQueued.status, "synced");
+    const stableResult = await services.syncOfflineReports(volunteer, DEMO_EVENT_ID, "stable");
+    assert.ok(stableResult.synced.some((operation) => operation.id === queuedPerson.id));
+    assert.ok(stableResult.synced.some((operation) => operation.id === queuedItem.id));
     assert.equal(stableResult.remainingPending.length, 0);
+    assert.equal((await repositories.personCases.getById(queuedPerson.localEntityId))?.status, "report_created");
+    assert.equal((await repositories.itemCases.getById(queuedItem.localEntityId))?.status, "report_created");
+  });
 
-    const syncedCase = await repositories.cases.getById(queued.localEntityId);
-    assert.equal(syncedCase?.status, "reported");
+  test("final person reunion and item release are blocked while offline", async () => {
+    const { repositories, services } = createDemoSafetyKernel();
+    const coordinator = await getActor(repositories, "staff_demo_coordinator");
+
+    const personMatch = (
+      await services.suggestPersonMatches(coordinator, "person_looking_child_open")
+    ).find((match) => match.foundCaseId === "person_found_child_candidate");
+    assert.ok(personMatch);
+    const confirmedPersonMatch = await services.confirmPersonMatch(coordinator, {
+      matchId: personMatch.id,
+      connectivityStatus: "stable"
+    });
+    await assert.rejects(
+      () =>
+        services.completePersonHandover(coordinator, {
+          eventId: DEMO_EVENT_ID,
+          matchId: confirmedPersonMatch.id,
+          verificationMethod: "Information Bureau verification test",
+          handedOverAt: "2026-08-10T21:15:00Z",
+          connectivityStatus: "degraded"
+        }),
+      DomainRuleError
+    );
+
+    const itemMatch = (
+      await services.suggestItemMatches(coordinator, "item_lost_bag_open")
+    ).find((match) => match.foundItemCaseId === "item_found_bag_candidate");
+    assert.ok(itemMatch);
+    const confirmedItemMatch = await services.confirmItemMatch(coordinator, {
+      matchId: itemMatch.id,
+      connectivityStatus: "stable"
+    });
+    await assert.rejects(
+      () =>
+        services.completeItemRelease(coordinator, {
+          eventId: DEMO_EVENT_ID,
+          matchId: confirmedItemMatch.id,
+          proofOfOwnershipMethod: "Proof detail matched",
+          releasedAt: "2026-08-10T21:16:00Z",
+          connectivityStatus: "degraded"
+        }),
+      DomainRuleError
+    );
   });
 });
 
-describe("dashboard aggregation", () => {
-  test("leadership summary contains aggregate values only", async () => {
+describe("access and analytics safeguards", () => {
+  test("public reporter cannot resolve cases", async () => {
+    const { repositories, services } = createDemoSafetyKernel();
+    const publicReporter = await getActor(repositories, "public_demo_reporter");
+
+    await assert.rejects(
+      () =>
+        services.completePersonHandover(publicReporter, {
+          eventId: DEMO_EVENT_ID,
+          matchId: "person_match_demo_completed",
+          verificationMethod: "Not allowed",
+          handedOverAt: "2026-08-10T21:20:00Z",
+          connectivityStatus: "stable"
+        }),
+      /not permitted/
+    );
+    await assert.rejects(
+      () =>
+        services.completeItemRelease(publicReporter, {
+          eventId: DEMO_EVENT_ID,
+          matchId: "item_match_demo_completed",
+          proofOfOwnershipMethod: "Not allowed",
+          releasedAt: "2026-08-10T21:21:00Z",
+          connectivityStatus: "stable"
+        }),
+      /not permitted/
+    );
+  });
+
+  test("leadership analytics remain aggregate-only", async () => {
     const { repositories, services } = createDemoSafetyKernel();
     const leadership = await getActor(repositories, "staff_demo_leadership");
 
-    const summary = await services.getDashboardSummary(leadership, DEMO_EVENT_ID, "stable");
+    const summary = await services.getLeadershipAnalytics(leadership, DEMO_EVENT_ID, "stable");
     const serializedSummary = JSON.stringify(summary);
 
     assert.equal(summary.view, "leadership_aggregate");
     assert.equal(summary.sensitiveCaseDetailsIncluded, false);
-    assert.ok(summary.openMissingCases >= 1);
+    assert.ok(summary.personReportsTotal >= 1);
+    assert.ok(summary.itemReportsTotal >= 1);
     assert.ok(summary.hotspots.every((hotspot) => !("caseId" in hotspot)));
-    assert.equal(serializedSummary.includes("case_missing_child_open"), false);
+    assert.equal(serializedSummary.includes("person_looking_child_open"), false);
     assert.equal(serializedSummary.includes("Fictional demo-only"), false);
+    assert.equal(serializedSummary.includes("hiddenVerificationDetail"), false);
+  });
+
+  test("removed person-attached QR concepts do not remain in active source or docs", async () => {
+    const filesToScan = [
+      "AGENTS.md",
+      "PRODUCT_SPEC.md",
+      "ARCHITECTURE.md",
+      "DATA_MODEL.md",
+      "API_CONTRACTS.md",
+      "IMPLEMENTATION_PLAN.md",
+      "DECISIONS.md",
+      "README.md",
+      "src/domain/types.ts",
+      "src/domain/match-engine.ts",
+      "src/domain/permissions.ts",
+      "src/repositories/interfaces.ts",
+      "src/repositories/demo/seed-data.ts",
+      "src/services/safety-kernel.ts"
+    ];
+    const bannedConcepts = [
+      "Safe" + "Card",
+      "Safe" + "Band",
+      "Reunite" + " Pass",
+      "Safety" + "Card",
+      ["safety", "cards"].join("_"),
+      ["/safe", "card"].join(""),
+      ["exact", ["safe", "card"].join(""), "token"].join("_"),
+      ["safe", "card"].join("")
+    ];
+
+    for (const file of filesToScan) {
+      const content = await readFile(path.join(process.cwd(), file), "utf8");
+      for (const concept of bannedConcepts) {
+        assert.equal(
+          content.toLowerCase().includes(concept.toLowerCase()),
+          false,
+          `${concept} should not appear in ${file}`
+        );
+      }
+    }
   });
 });
 
 async function getActor(
   repositories: ReturnType<typeof createDemoSafetyKernel>["repositories"],
-  staffId: string
+  actorId: string
 ) {
-  const actor = await repositories.staffProfiles.getById(staffId);
-  assert.ok(actor, `Expected demo staff profile ${staffId} to exist.`);
+  const actor = await repositories.actorProfiles.getById(actorId);
+  assert.ok(actor, `Expected demo actor profile ${actorId} to exist.`);
   return actor;
 }

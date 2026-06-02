@@ -1,25 +1,30 @@
 import type {
+  ActorProfile,
   AnnouncementEscalation,
   AuditLog,
-  CaseMatch,
   Event,
-  HelpPoint,
-  HandoverRecord,
+  ItemCase,
+  ItemMatchRecommendation,
+  ItemReleaseRecord,
   OfflineSyncOperation,
-  SafetyCard,
-  SeparationCase
+  PersonCase,
+  PersonHandoverRecord,
+  PersonMatchRecommendation,
+  ReunitePoint
 } from "../../domain/types";
 import type {
   AnnouncementRepository,
   AuditRepository,
   EventRepository,
-  HelpPointRepository,
-  HandoverRepository,
-  MatchRepository,
+  ItemCaseRepository,
+  ItemMatchRepository,
+  ItemReleaseRepository,
   OfflineQueueRepository,
-  ReuniteRepositories,
-  SafetyCardRepository,
-  SeparationCaseRepository
+  PersonCaseRepository,
+  PersonHandoverRepository,
+  PersonMatchRepository,
+  ReunitePointRepository,
+  ReuniteRepositories
 } from "../interfaces";
 import { createDemoDataSet, type DemoDataSet } from "./seed-data";
 
@@ -39,120 +44,183 @@ export class InMemoryEventRepository implements EventRepository {
   }
 }
 
-export class InMemoryHelpPointRepository implements HelpPointRepository {
-  constructor(private readonly helpPoints: HelpPoint[]) {}
+export class InMemoryReunitePointRepository implements ReunitePointRepository {
+  constructor(private readonly reunitePoints: ReunitePoint[]) {}
 
-  async listByEvent(eventId: string): Promise<HelpPoint[]> {
-    return clone(this.helpPoints.filter((helpPoint) => helpPoint.eventId === eventId));
+  async listByEvent(eventId: string): Promise<ReunitePoint[]> {
+    return clone(this.reunitePoints.filter((point) => point.eventId === eventId));
   }
 
-  async getById(id: string): Promise<HelpPoint | null> {
-    return clone(this.helpPoints.find((helpPoint) => helpPoint.id === id) ?? null);
-  }
-}
-
-export class InMemorySafetyCardRepository implements SafetyCardRepository {
-  constructor(private readonly safetyCards: SafetyCard[]) {}
-
-  async create(card: SafetyCard): Promise<SafetyCard> {
-    this.safetyCards.push(clone(card));
-    return clone(card);
+  async getById(id: string): Promise<ReunitePoint | null> {
+    return clone(this.reunitePoints.find((point) => point.id === id) ?? null);
   }
 
-  async getById(id: string): Promise<SafetyCard | null> {
-    return clone(this.safetyCards.find((card) => card.id === id) ?? null);
-  }
-
-  async findActiveByTokenHash(tokenHash: string): Promise<SafetyCard | null> {
+  async getByCode(eventId: string, code: string): Promise<ReunitePoint | null> {
     return clone(
-      this.safetyCards.find((card) => card.tokenHash === tokenHash && card.status === "active") ?? null
+      this.reunitePoints.find((point) => point.eventId === eventId && point.code === code) ?? null
     );
   }
-
-  async listByEvent(eventId: string): Promise<SafetyCard[]> {
-    return clone(this.safetyCards.filter((card) => card.eventId === eventId));
-  }
 }
 
-export class InMemorySeparationCaseRepository implements SeparationCaseRepository {
-  constructor(private readonly separationCases: SeparationCase[]) {}
+export class InMemoryPersonCaseRepository implements PersonCaseRepository {
+  constructor(private readonly personCases: PersonCase[]) {}
 
-  async create(separationCase: SeparationCase): Promise<SeparationCase> {
-    this.separationCases.push(clone(separationCase));
-    return clone(separationCase);
+  async create(personCase: PersonCase): Promise<PersonCase> {
+    this.personCases.push(clone(personCase));
+    return clone(personCase);
   }
 
-  async update(separationCase: SeparationCase): Promise<SeparationCase> {
-    const index = this.separationCases.findIndex((candidate) => candidate.id === separationCase.id);
+  async update(personCase: PersonCase): Promise<PersonCase> {
+    const index = this.personCases.findIndex((candidate) => candidate.id === personCase.id);
     if (index === -1) {
-      throw new Error(`Separation case ${separationCase.id} was not found.`);
+      throw new Error(`Person case ${personCase.id} was not found.`);
     }
 
-    this.separationCases[index] = clone(separationCase);
-    return clone(separationCase);
+    this.personCases[index] = clone(personCase);
+    return clone(personCase);
   }
 
-  async getById(id: string): Promise<SeparationCase | null> {
-    return clone(this.separationCases.find((separationCase) => separationCase.id === id) ?? null);
+  async getById(id: string): Promise<PersonCase | null> {
+    return clone(this.personCases.find((personCase) => personCase.id === id) ?? null);
   }
 
-  async listByEvent(eventId: string): Promise<SeparationCase[]> {
-    return clone(this.separationCases.filter((separationCase) => separationCase.eventId === eventId));
+  async listByEvent(eventId: string): Promise<PersonCase[]> {
+    return clone(this.personCases.filter((personCase) => personCase.eventId === eventId));
   }
 
-  async listByEventAndType(
+  async listByEventAndIntent(
     eventId: string,
-    caseType: SeparationCase["caseType"]
-  ): Promise<SeparationCase[]> {
+    caseIntent: PersonCase["caseIntent"]
+  ): Promise<PersonCase[]> {
     return clone(
-      this.separationCases.filter(
-        (separationCase) => separationCase.eventId === eventId && separationCase.caseType === caseType
+      this.personCases.filter(
+        (personCase) => personCase.eventId === eventId && personCase.caseIntent === caseIntent
       )
     );
   }
 }
 
-export class InMemoryMatchRepository implements MatchRepository {
-  constructor(private readonly matches: CaseMatch[]) {}
+export class InMemoryItemCaseRepository implements ItemCaseRepository {
+  constructor(private readonly itemCases: ItemCase[]) {}
 
-  async create(match: CaseMatch): Promise<CaseMatch> {
+  async create(itemCase: ItemCase): Promise<ItemCase> {
+    this.itemCases.push(clone(itemCase));
+    return clone(itemCase);
+  }
+
+  async update(itemCase: ItemCase): Promise<ItemCase> {
+    const index = this.itemCases.findIndex((candidate) => candidate.id === itemCase.id);
+    if (index === -1) {
+      throw new Error(`Item case ${itemCase.id} was not found.`);
+    }
+
+    this.itemCases[index] = clone(itemCase);
+    return clone(itemCase);
+  }
+
+  async getById(id: string): Promise<ItemCase | null> {
+    return clone(this.itemCases.find((itemCase) => itemCase.id === id) ?? null);
+  }
+
+  async listByEvent(eventId: string): Promise<ItemCase[]> {
+    return clone(this.itemCases.filter((itemCase) => itemCase.eventId === eventId));
+  }
+
+  async listByEventAndIntent(
+    eventId: string,
+    itemIntent: ItemCase["itemIntent"]
+  ): Promise<ItemCase[]> {
+    return clone(
+      this.itemCases.filter((itemCase) => itemCase.eventId === eventId && itemCase.itemIntent === itemIntent)
+    );
+  }
+}
+
+export class InMemoryPersonMatchRepository implements PersonMatchRepository {
+  constructor(private readonly matches: PersonMatchRecommendation[]) {}
+
+  async create(match: PersonMatchRecommendation): Promise<PersonMatchRecommendation> {
     this.matches.push(clone(match));
     return clone(match);
   }
 
-  async update(match: CaseMatch): Promise<CaseMatch> {
+  async update(match: PersonMatchRecommendation): Promise<PersonMatchRecommendation> {
     const index = this.matches.findIndex((candidate) => candidate.id === match.id);
     if (index === -1) {
-      throw new Error(`Case match ${match.id} was not found.`);
+      throw new Error(`Person match ${match.id} was not found.`);
     }
 
     this.matches[index] = clone(match);
     return clone(match);
   }
 
-  async getById(id: string): Promise<CaseMatch | null> {
+  async getById(id: string): Promise<PersonMatchRecommendation | null> {
     return clone(this.matches.find((match) => match.id === id) ?? null);
   }
 
-  async listByEvent(eventId: string): Promise<CaseMatch[]> {
+  async listByEvent(eventId: string): Promise<PersonMatchRecommendation[]> {
     return clone(this.matches.filter((match) => match.eventId === eventId));
   }
 }
 
-export class InMemoryHandoverRepository implements HandoverRepository {
-  constructor(private readonly handoverRecords: HandoverRecord[]) {}
+export class InMemoryItemMatchRepository implements ItemMatchRepository {
+  constructor(private readonly matches: ItemMatchRecommendation[]) {}
 
-  async create(record: HandoverRecord): Promise<HandoverRecord> {
+  async create(match: ItemMatchRecommendation): Promise<ItemMatchRecommendation> {
+    this.matches.push(clone(match));
+    return clone(match);
+  }
+
+  async update(match: ItemMatchRecommendation): Promise<ItemMatchRecommendation> {
+    const index = this.matches.findIndex((candidate) => candidate.id === match.id);
+    if (index === -1) {
+      throw new Error(`Item match ${match.id} was not found.`);
+    }
+
+    this.matches[index] = clone(match);
+    return clone(match);
+  }
+
+  async getById(id: string): Promise<ItemMatchRecommendation | null> {
+    return clone(this.matches.find((match) => match.id === id) ?? null);
+  }
+
+  async listByEvent(eventId: string): Promise<ItemMatchRecommendation[]> {
+    return clone(this.matches.filter((match) => match.eventId === eventId));
+  }
+}
+
+export class InMemoryPersonHandoverRepository implements PersonHandoverRepository {
+  constructor(private readonly handoverRecords: PersonHandoverRecord[]) {}
+
+  async create(record: PersonHandoverRecord): Promise<PersonHandoverRecord> {
     this.handoverRecords.push(clone(record));
     return clone(record);
   }
 
-  async findByMatchId(matchId: string): Promise<HandoverRecord | null> {
+  async findByMatchId(matchId: string): Promise<PersonHandoverRecord | null> {
     return clone(this.handoverRecords.find((record) => record.matchId === matchId) ?? null);
   }
 
-  async listByEvent(eventId: string): Promise<HandoverRecord[]> {
+  async listByEvent(eventId: string): Promise<PersonHandoverRecord[]> {
     return clone(this.handoverRecords.filter((record) => record.eventId === eventId));
+  }
+}
+
+export class InMemoryItemReleaseRepository implements ItemReleaseRepository {
+  constructor(private readonly releaseRecords: ItemReleaseRecord[]) {}
+
+  async create(record: ItemReleaseRecord): Promise<ItemReleaseRecord> {
+    this.releaseRecords.push(clone(record));
+    return clone(record);
+  }
+
+  async findByMatchId(matchId: string): Promise<ItemReleaseRecord | null> {
+    return clone(this.releaseRecords.find((record) => record.matchId === matchId) ?? null);
+  }
+
+  async listByEvent(eventId: string): Promise<ItemReleaseRecord[]> {
+    return clone(this.releaseRecords.filter((record) => record.eventId === eventId));
   }
 }
 
@@ -195,9 +263,7 @@ export class InMemoryOfflineQueueRepository implements OfflineQueueRepository {
   }
 
   async update(operation: OfflineSyncOperation): Promise<OfflineSyncOperation> {
-    const index = this.offlineSyncOperations.findIndex(
-      (candidate) => candidate.id === operation.id
-    );
+    const index = this.offlineSyncOperations.findIndex((candidate) => candidate.id === operation.id);
     if (index === -1) {
       throw new Error(`Offline operation ${operation.id} was not found.`);
     }
@@ -207,9 +273,7 @@ export class InMemoryOfflineQueueRepository implements OfflineQueueRepository {
   }
 
   async listByEvent(eventId: string): Promise<OfflineSyncOperation[]> {
-    return clone(
-      this.offlineSyncOperations.filter((operation) => operation.payload.eventId === eventId)
-    );
+    return clone(this.offlineSyncOperations.filter((operation) => operation.payload.eventId === eventId));
   }
 
   async listPendingByEvent(eventId: string): Promise<OfflineSyncOperation[]> {
@@ -223,23 +287,23 @@ export class InMemoryOfflineQueueRepository implements OfflineQueueRepository {
 
 export interface DemoRepositoryBundle extends ReuniteRepositories {
   data: DemoDataSet;
-  staffProfiles: StaffProfileLookup;
+  actorProfiles: ActorProfileLookup;
 }
 
-export interface StaffProfileLookup {
-  getById(id: string): Promise<import("../../domain/types").StaffProfile | null>;
-  list(): Promise<import("../../domain/types").StaffProfile[]>;
+export interface ActorProfileLookup {
+  getById(id: string): Promise<ActorProfile | null>;
+  list(): Promise<ActorProfile[]>;
 }
 
-class InMemoryStaffProfileLookup implements StaffProfileLookup {
-  constructor(private readonly staffProfiles: import("../../domain/types").StaffProfile[]) {}
+class InMemoryActorProfileLookup implements ActorProfileLookup {
+  constructor(private readonly actorProfiles: ActorProfile[]) {}
 
-  async getById(id: string): Promise<import("../../domain/types").StaffProfile | null> {
-    return clone(this.staffProfiles.find((staffProfile) => staffProfile.id === id) ?? null);
+  async getById(id: string): Promise<ActorProfile | null> {
+    return clone(this.actorProfiles.find((actorProfile) => actorProfile.id === id) ?? null);
   }
 
-  async list(): Promise<import("../../domain/types").StaffProfile[]> {
-    return clone(this.staffProfiles);
+  async list(): Promise<ActorProfile[]> {
+    return clone(this.actorProfiles);
   }
 }
 
@@ -247,15 +311,17 @@ export function createDemoRepositories(data: DemoDataSet = createDemoDataSet()):
   return {
     data,
     events: new InMemoryEventRepository(data.events),
-    helpPoints: new InMemoryHelpPointRepository(data.helpPoints),
-    safetyCards: new InMemorySafetyCardRepository(data.safetyCards),
-    cases: new InMemorySeparationCaseRepository(data.separationCases),
-    matches: new InMemoryMatchRepository(data.caseMatches),
-    handovers: new InMemoryHandoverRepository(data.handoverRecords),
+    reunitePoints: new InMemoryReunitePointRepository(data.reunitePoints),
+    personCases: new InMemoryPersonCaseRepository(data.personCases),
+    itemCases: new InMemoryItemCaseRepository(data.itemCases),
+    personMatches: new InMemoryPersonMatchRepository(data.personMatchRecommendations),
+    itemMatches: new InMemoryItemMatchRepository(data.itemMatchRecommendations),
+    personHandovers: new InMemoryPersonHandoverRepository(data.personHandoverRecords),
+    itemReleases: new InMemoryItemReleaseRepository(data.itemReleaseRecords),
     announcements: new InMemoryAnnouncementRepository(data.announcementEscalations),
     audits: new InMemoryAuditRepository(data.auditLogs),
     offlineQueue: new InMemoryOfflineQueueRepository(data.offlineSyncOperations),
-    staffProfiles: new InMemoryStaffProfileLookup(data.staffProfiles)
+    actorProfiles: new InMemoryActorProfileLookup(data.actorProfiles)
   };
 }
 

@@ -1,32 +1,38 @@
 # ReuniteRC
 
-ReuniteRC is an offline-resilient digital operating layer for family reunification support during major Redemption City programmes such as Convention and Congress.
+ReuniteRC is a digital reunification and lost-and-found solution for major programmes in Redemption City.
 
 It is being built for Kingdom Hack 3.0 as a civic safety platform prototype that strengthens the existing Information Bureau and PA announcement workflow.
 
 ## Product Promise
 
-Every separation case should be securely captured, assisted, matched, handed over and measurable, even when connectivity is unstable.
+Every separation or lost-and-found case should be securely captured, assisted, matched, verified, handed over or released, and measurable, even when connectivity is unstable.
 
-## What This Prototype Will Demonstrate
+## What This Prototype Demonstrates
 
-- Structured missing and found-person case logging.
-- Optional QR SafeCard/SafeBand generation with secure token-only QR content.
-- Rule-based assisted matching with human confirmation.
-- Verified guardian or group leader handover before closure.
+- Official Reunite Points with visible Point Codes and no-internet fallback instructions.
+- Structured looking-for-person and found-person reports.
+- Structured lost-item and found-item reports.
+- Rule-based person matching with human confirmation.
+- Rule-based item matching with proof-of-ownership verification.
+- Verified person handover before safe reunion.
+- Verified item release before closure.
 - PA announcement escalation support.
-- Offline case capture with later synchronisation.
-- Event leadership dashboard with response performance and hotspot indicators.
+- Staff offline report capture with later synchronisation.
+- Aggregate leadership dashboard metrics.
 
 ## Safety Principles
 
 - Demo data must be fictional.
 - QR codes must not contain names, phone numbers or sensitive personal details.
+- Reunite Points identify reporting locations, not people.
 - Sensitive case details are authorised-staff information.
 - No public live tracking of vulnerable persons.
 - No facial recognition.
 - PA announcement is a fallback escalation workflow.
-- Safely reunited status requires verified handover.
+- Safe reunion requires verified handover.
+- Item release requires proof-of-ownership verification.
+- Final reunion and item release are blocked offline.
 
 ## Tech Stack
 
@@ -37,7 +43,7 @@ Every separation case should be securely captured, assisted, matched, handed ove
 - Lucide React icons.
 - Supabase PostgreSQL and Supabase Auth architecture.
 - Dexie/IndexedDB offline mutation queue.
-- qrcode.react for token QR rendering.
+- qrcode.react for Reunite Point QR rendering.
 - Vercel deployment.
 - npm package manager.
 
@@ -62,6 +68,7 @@ Run checks:
 ```bash
 npm run lint
 npm run typecheck
+npm run test
 npm run build
 ```
 
@@ -72,8 +79,11 @@ npm run build
 - `DATA_MODEL.md`: planned Supabase entities, relationships, indexes and privacy notes.
 - `API_CONTRACTS.md`: planned route/action contracts and role access.
 - `IMPLEMENTATION_PLAN.md`: sequenced build phases, acceptance criteria, tests and deployment checklist.
+- `DECISIONS.md`: locked product, architecture and safeguarding decisions.
 - `AGENTS.md`: operating guide for future Codex work.
 
 ## Current Status
 
-Phase 0 foundation scaffold is present. Dependencies have not been installed in this environment because package downloads require explicit approval.
+Phase 1B concept alignment is implemented. The active kernel supports Reunite Points, person cases, item cases, rule-based person and item matching, verified handover, verified item release, PA escalation, offline report queueing and aggregate analytics.
+
+No Phase 2A UI has been built yet.

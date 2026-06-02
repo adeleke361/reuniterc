@@ -8,9 +8,9 @@ The locked Supabase design is hybrid:
 
 - authenticated workflow mutations should use server actions when the Supabase adapter is added;
 - sync/API-style operations may use route handlers where appropriate;
-- the Phase 1 demo adapter uses in-memory repositories behind the same service contracts.
+- the Phase 1B demo adapter uses in-memory repositories behind the same service contracts.
 
-Offline sync is limited to new missing-person reports, found-person reports and draft PA escalation requests. Match confirmation, guardian verification and final handover closure require connected coordinator workflow.
+Offline sync is limited to new person reports, new item reports and draft PA escalation requests. Match confirmation, person handover and item release require connected Information Bureau workflow.
 
 ## Shared Error Shape
 
@@ -24,185 +24,15 @@ Offline sync is limited to new missing-person reports, found-person reports and 
 }
 ```
 
-## Register Safety Card
+## List Reunite Points
 
-Route: `POST /api/safety-cards`
-
-Authorised roles:
-
-- `information_bureau_coordinator`
-- `helppoint_volunteer`
-- `guardian_group_leader` for limited self-registration flow
-
-Request:
-
-```json
-{
-  "eventId": "evt_congress_night_2026",
-  "guardianDisplayLabel": "Fictional Parent A",
-  "relationshipLabel": "Parent",
-  "cardLabel": "Child SafeCard 01"
-}
-```
-
-Success:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "safetyCardId": "card_demo_001",
-    "qrToken": "demo-secure-random-token-only",
-    "tokenLast4": "only"
-  }
-}
-```
-
-Notes:
-
-- `qrToken` is returned only at generation time.
-- QR content must contain only the secure token.
-- Server storage should use a token hash.
-- Production token generation must occur server-side with cryptographically secure randomness.
-
-## Authorised SafeCard Token Lookup
-
-Route: `POST /api/safety-cards/lookup`
+Route: `GET /api/reunite-points?eventId=evt_congress_night_2026`
 
 Authorised roles:
 
 - `information_bureau_coordinator`
 - `helppoint_volunteer`
-
-Request:
-
-```json
-{
-  "eventId": "evt_congress_night_2026",
-  "qrToken": "demo-secure-random-token-only"
-}
-```
-
-Success:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "safetyCardId": "card_demo_001",
-    "tokenLast4": "only",
-    "status": "active",
-    "guardianDisplayLabel": "Fictional Parent A"
-  }
-}
-```
-
-Error:
-
-```json
-{
-  "ok": false,
-  "error": {
-    "code": "not_found",
-    "message": "No active Safety Card was found for that token."
-  }
-}
-```
-
-## Submit Missing-Person Case
-
-Route: `POST /api/cases/missing`
-
-Authorised roles:
-
-- `information_bureau_coordinator`
-- `helppoint_volunteer`
-
-Request:
-
-```json
-{
-  "eventId": "evt_congress_night_2026",
-  "personCategory": "child",
-  "approxAgeBand": "6-8",
-  "reportedAt": "2026-08-10T20:15:00Z",
-  "lastSeenLocation": "Auditorium East Entrance",
-  "safetyCardToken": "optional-secure-token",
-  "descriptionTags": ["blue-top", "small-backpack"],
-  "sensitiveNotes": "Fictional demo note for authorised staff only."
-}
-```
-
-Success:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "caseId": "case_missing_001",
-    "status": "open"
-  }
-}
-```
-
-Validation error:
-
-```json
-{
-  "ok": false,
-  "error": {
-    "code": "validation_error",
-    "message": "Person category and report location are required."
-  }
-}
-```
-
-## Submit Found-Person Case
-
-Route: `POST /api/cases/found`
-
-Authorised roles:
-
-- `information_bureau_coordinator`
-- `helppoint_volunteer`
-
-Request:
-
-```json
-{
-  "eventId": "evt_congress_night_2026",
-  "helpPointId": "hp_b",
-  "personCategory": "child",
-  "approxAgeBand": "6-8",
-  "reportedAt": "2026-08-10T20:26:00Z",
-  "foundLocation": "HelpPoint B",
-  "safetyCardToken": "optional-secure-token",
-  "descriptionTags": ["blue-top", "small-backpack"],
-  "sensitiveNotes": "Fictional demo note for authorised staff only."
-}
-```
-
-Success:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "caseId": "case_found_001",
-    "status": "awaiting_match"
-  }
-}
-```
-
-## List Open Cases
-
-Route: `GET /api/cases?eventId=evt_congress_night_2026&status=open`
-
-Authorised roles:
-
-- `information_bureau_coordinator`
-- `helppoint_volunteer` with scoped visibility
-- `leadership_viewer` only for anonymised summary mode
+- `leadership_viewer`
 
 Success:
 
@@ -211,21 +41,181 @@ Success:
   "ok": true,
   "data": [
     {
-      "caseId": "case_missing_001",
-      "caseType": "missing",
-      "status": "open",
-      "personCategory": "child",
-      "approxAgeBand": "6-8",
-      "locationLabel": "Auditorium East Entrance",
-      "reportedAt": "2026-08-10T20:15:00Z"
+      "id": "point_arena_rear",
+      "code": "RP-014",
+      "name": "Arena Rear Reunite Point",
+      "zone": "Arena Rear",
+      "locationLabel": "Arena Rear access walkway",
+      "officialShortUrl": "https://rc.example/rp014",
+      "fallbackInstruction": "If the QR form does not load, report this Point Code to an official volunteer, usher, security point or the Information Bureau.",
+      "tamperCheckInstruction": "Confirm official branding, visible short URL and intact poster serial before scanning."
     }
   ]
 }
 ```
 
-## Compute Suggested Matches
+Notes:
 
-Route: `POST /api/matches/suggest`
+- A Reunite Point identifies a reporting location, not a person.
+- QR content must not contain personal or sensitive case details.
+
+## Submit Looking-For-Person Report
+
+Route: `POST /api/person-cases/looking`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+- `helppoint_volunteer`
+- `public_reporter`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "reportSourcePointId": "point_arena_rear",
+  "personCategory": "child",
+  "approximateAgeBand": "6-8",
+  "reportedAt": "2026-08-10T20:15:00Z",
+  "lastSeenOrFoundLocation": "Arena Rear access walkway",
+  "groupOrChurchReference": "Fictional Province Alpha Group",
+  "nonSensitiveDescriptionTags": ["blue-top", "small-backpack"],
+  "sensitiveNotes": "Fictional staff-only note.",
+  "urgency": "urgent",
+  "publicReporterReference": "Fictional reporter reference"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "caseId": "person_looking_001",
+    "status": "report_created"
+  }
+}
+```
+
+## Submit Found-Person Report
+
+Route: `POST /api/person-cases/found`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+- `helppoint_volunteer`
+- `public_reporter`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "reportSourcePointId": "point_arena_rear",
+  "personCategory": "child",
+  "approximateAgeBand": "6-8",
+  "reportedAt": "2026-08-10T20:26:00Z",
+  "lastSeenOrFoundLocation": "Arena Rear volunteer desk",
+  "groupOrChurchReference": "Fictional Province Alpha Group",
+  "nonSensitiveDescriptionTags": ["blue-top", "small-backpack"],
+  "sensitiveNotes": "Fictional staff-only note.",
+  "urgency": "urgent"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "caseId": "person_found_001",
+    "status": "report_created"
+  }
+}
+```
+
+## Submit Lost-Item Report
+
+Route: `POST /api/item-cases/lost`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+- `helppoint_volunteer`
+- `public_reporter`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "reportSourcePointId": "point_arena_rear",
+  "itemCategory": "bag",
+  "itemColorOrDescriptionTags": ["black-bag", "notebook-sticker"],
+  "reportedAt": "2026-08-10T20:10:00Z",
+  "lastSeenOrFoundLocation": "Arena Rear seating row",
+  "hiddenVerificationDetail": "Fictional yellow ribbon on inner zipper",
+  "claimantReference": "Fictional claimant reference",
+  "urgency": "standard"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "caseId": "item_lost_001",
+    "status": "report_created"
+  }
+}
+```
+
+## Submit Found-Item Report
+
+Route: `POST /api/item-cases/found`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+- `helppoint_volunteer`
+- `public_reporter`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "reportSourcePointId": "point_arena_rear",
+  "itemCategory": "bag",
+  "itemColorOrDescriptionTags": ["black-bag", "notebook-sticker"],
+  "reportedAt": "2026-08-10T20:42:00Z",
+  "lastSeenOrFoundLocation": "Arena Rear volunteer desk",
+  "hiddenVerificationDetail": "Fictional yellow ribbon on inner zipper",
+  "urgency": "standard"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "caseId": "item_found_001",
+    "status": "report_created"
+  }
+}
+```
+
+## Compute Suggested Person Matches
+
+Route: `POST /api/person-matches/suggest`
 
 Authorised roles:
 
@@ -236,7 +226,7 @@ Request:
 ```json
 {
   "eventId": "evt_congress_night_2026",
-  "caseId": "case_missing_001"
+  "lookingCaseId": "person_looking_001"
 }
 ```
 
@@ -247,15 +237,18 @@ Success:
   "ok": true,
   "data": [
     {
-      "missingCaseId": "case_missing_001",
-      "foundCaseId": "case_found_001",
-      "score": 96,
+      "lookingCaseId": "person_looking_001",
+      "foundCaseId": "person_found_001",
+      "score": 100,
+      "tier": "strong_match_recommendation",
       "reasons": [
-        "Exact SafeCard token match",
+        "Same or nearby Reunite Point proximity group",
+        "Reports within 30 minutes",
         "Same person category",
         "Compatible age band",
-        "Reported within 15 minutes",
-        "Two shared description tags"
+        "Group reference overlap",
+        "Non-sensitive description tags overlap",
+        "Human verification required before reunion."
       ]
     }
   ]
@@ -264,12 +257,58 @@ Success:
 
 Notes:
 
-- This is a rule-based assisted match engine, not AI.
-- Human confirmation is required.
+- This is a transparent rule-based engine.
+- Human verification is required before reunion.
 
-## Confirm Or Reject Match
+## Compute Suggested Item Matches
 
-Route: `POST /api/matches/{matchId}/decision`
+Route: `POST /api/item-matches/suggest`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "lostItemCaseId": "item_lost_001"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": [
+    {
+      "lostItemCaseId": "item_lost_001",
+      "foundItemCaseId": "item_found_001",
+      "score": 100,
+      "tier": "strong_match_recommendation",
+      "reasons": [
+        "Same item category",
+        "Same or compatible Reunite Point zone",
+        "Reasonable report-time window",
+        "Colour or description tags overlap",
+        "Staff-only hidden verification detail is compatible",
+        "Proof of ownership required before release."
+      ]
+    }
+  ]
+}
+```
+
+Notes:
+
+- Hidden verification detail must remain staff-only.
+- Proof of ownership is required before release.
+
+## Confirm Or Reject Person Match
+
+Route: `POST /api/person-matches/{matchId}/decision`
 
 Authorised roles:
 
@@ -280,7 +319,7 @@ Request:
 ```json
 {
   "decision": "confirmed",
-  "reviewNotes": "Fictional demo coordinator confirmation."
+  "reviewNotes": "Fictional coordinator confirmation."
 }
 ```
 
@@ -290,52 +329,8 @@ Success:
 {
   "ok": true,
   "data": {
-    "matchId": "match_demo_001",
+    "matchId": "person_match_001",
     "status": "confirmed"
-  }
-}
-```
-
-## Record Verified Handover
-
-Route: `POST /api/handover`
-
-Authorised roles:
-
-- `information_bureau_coordinator`
-
-Request:
-
-```json
-{
-  "eventId": "evt_congress_night_2026",
-  "matchId": "match_demo_001",
-  "verificationMethod": "SafeCard token plus staff interview",
-  "verificationNotes": "Fictional verification note for authorised staff only.",
-  "handedOverAt": "2026-08-10T20:42:00Z"
-}
-```
-
-Success:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "handoverId": "handover_demo_001",
-    "caseStatus": "safely_reunited"
-  }
-}
-```
-
-Error:
-
-```json
-{
-  "ok": false,
-  "error": {
-    "code": "match_not_confirmed",
-    "message": "A match must be confirmed before handover can be recorded."
   }
 }
 ```
@@ -347,7 +342,102 @@ Connected-workflow error:
   "ok": false,
   "error": {
     "code": "connected_workflow_required",
-    "message": "Verified handover closure requires connected coordinator workflow."
+    "message": "Match confirmation requires connected Information Bureau workflow."
+  }
+}
+```
+
+## Confirm Or Reject Item Match
+
+Route: `POST /api/item-matches/{matchId}/decision`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+
+Request:
+
+```json
+{
+  "decision": "confirmed",
+  "reviewNotes": "Fictional item match confirmation."
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "matchId": "item_match_001",
+    "status": "confirmed"
+  }
+}
+```
+
+## Record Verified Person Handover
+
+Route: `POST /api/person-handovers`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "matchId": "person_match_001",
+  "verifiedReporterReference": "Fictional reporter reference",
+  "verificationMethod": "Information Bureau interview and group reference check",
+  "verificationNotes": "Fictional verification note for authorised staff only.",
+  "handedOverAt": "2026-08-10T20:42:00Z"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "handoverId": "person_handover_001",
+    "caseStatus": "safely_reunited"
+  }
+}
+```
+
+## Record Verified Item Release
+
+Route: `POST /api/item-releases`
+
+Authorised roles:
+
+- `information_bureau_coordinator`
+
+Request:
+
+```json
+{
+  "eventId": "evt_congress_night_2026",
+  "matchId": "item_match_001",
+  "claimantReference": "Fictional claimant reference",
+  "proofOfOwnershipMethod": "Hidden item detail and claimant description matched",
+  "proofNotes": "Fictional proof note for authorised staff only.",
+  "releasedAt": "2026-08-10T20:50:00Z"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "releaseId": "item_release_001",
+    "caseStatus": "item_released"
   }
 }
 ```
@@ -365,7 +455,8 @@ Request:
 ```json
 {
   "eventId": "evt_congress_night_2026",
-  "caseId": "case_missing_002",
+  "caseKind": "person_case",
+  "caseId": "person_looking_002",
   "announcementText": "Privacy-conscious fictional announcement text.",
   "reason": "Unresolved after coordinator review"
 }
@@ -377,11 +468,15 @@ Success:
 {
   "ok": true,
   "data": {
-    "announcementId": "ann_demo_001",
+    "announcementId": "announcement_demo_001",
     "status": "queued"
   }
 }
 ```
+
+Notes:
+
+- PA escalation does not resolve person or item cases.
 
 ## Dashboard Metrics
 
@@ -390,7 +485,7 @@ Route: `GET /api/dashboard?eventId=evt_congress_night_2026`
 Authorised roles:
 
 - `information_bureau_coordinator`
-- `leadership_viewer` with anonymised response
+- `leadership_viewer` with aggregate response only
 
 Success:
 
@@ -400,18 +495,19 @@ Success:
   "data": {
     "eventName": "Congress Night 2026",
     "connectivityStatus": "stable",
-    "openMissingCases": 3,
-    "foundAwaitingMatch": 2,
-    "safelyReunitedTotal": 18,
+    "personReportsTotal": 12,
+    "itemReportsTotal": 7,
+    "openLookingForPersonCases": 3,
+    "foundPersonsAwaitingMatch": 2,
+    "openLostItemCases": 2,
+    "foundItemsAwaitingMatch": 1,
+    "safelyReunitedTotal": 4,
+    "releasedItemsTotal": 3,
     "medianReunionMinutes": 24,
+    "medianItemReleaseMinutes": 31,
     "paEscalations": 1,
     "offlineReportsPendingSync": 0,
-    "hotspots": [
-      {
-        "locationLabel": "Auditorium East Entrance",
-        "caseCount": 4
-      }
-    ]
+    "sensitiveCaseDetailsIncluded": false
   }
 }
 ```
@@ -432,14 +528,15 @@ Request:
   "operations": [
     {
       "clientOperationId": "offline_demo_001",
-      "operationType": "submit_found_case",
+      "operationType": "create_found_person_report",
       "createdAt": "2026-08-10T20:30:00Z",
       "payload": {
         "eventId": "evt_congress_night_2026",
-        "helpPointId": "hp_b",
+        "reportSourcePointId": "point_arena_rear",
+        "caseIntent": "found_person",
         "personCategory": "child",
-        "approxAgeBand": "6-8",
-        "foundLocation": "HelpPoint B"
+        "approximateAgeBand": "6-8",
+        "lastSeenOrFoundLocation": "Arena Rear volunteer desk"
       }
     }
   ]
@@ -455,7 +552,7 @@ Success:
     "synced": [
       {
         "clientOperationId": "offline_demo_001",
-        "serverEntityId": "case_found_002",
+        "serverEntityId": "person_found_002",
         "status": "synced"
       }
     ],
@@ -466,6 +563,6 @@ Success:
 
 Offline operation constraints:
 
-- `submit_missing_case` and `submit_found_case` may create local `pending_sync` records before sync.
+- `create_looking_for_person_report`, `create_found_person_report`, `create_lost_item_report` and `create_found_item_report` may create local `pending_sync` records before sync.
 - `draft_announcement_escalation` may be queued offline as a draft only.
-- Match decisions and verified handovers are not accepted through offline sync.
+- Match decisions, verified handovers and item releases are not accepted through offline sync.

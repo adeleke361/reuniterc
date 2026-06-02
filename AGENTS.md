@@ -4,31 +4,35 @@ This repository is for ReuniteRC, a competition-grade civic safety platform prot
 
 ## Product Context
 
-ReuniteRC supports the existing Redemption City Information Bureau workflow used during major programmes such as Convention and Congress. The Information Bureau behind the auditorium already receives reports of separated children, elderly attendees and group members, then uses authorised handling and altar/PA announcements when needed.
+ReuniteRC is a digital reunification and lost-and-found solution for major programmes in Redemption City.
 
-The product must strengthen this trusted operating model. It must not replace staff judgement, guardian verification or the PA escalation process.
+It supports the existing Redemption City Information Bureau workflow used during major programmes such as Convention and Congress. The Information Bureau remains the operational owner for separated-person and found-item handling, with PA/public announcement as a trusted fallback for urgent or unresolved cases.
 
-Core promise: every separation case should be securely captured, assisted, matched, handed over and measurable, even when connectivity is unstable.
+The product uses official physical Reunite Points: posters, placards, billboards or help signs placed at key locations around camp. A Reunite Point identifies a reporting location, not a person.
+
+Core promise: every separation or lost-and-found case should be securely captured, assisted, matched, verified, handed over or released, and measurable, even when connectivity is unstable.
 
 ## Safety And Privacy Rules
 
 - Use only fictional demo identities and fictional case information.
 - Do not implement public live tracking of children, elderly attendees or other vulnerable people.
 - Do not place names, phone numbers or sensitive personal details inside visible QR codes.
-- QR SafeCards or SafeBands must encode secure random tokens only.
+- Reunite Point QR codes must support online reporting location context only.
 - Sensitive case details are authorised-staff information.
-- Closing a case as reunited must require a verified handover step.
+- Closing a person case as safely reunited must require a verified handover step.
+- Releasing an item must require proof-of-ownership verification.
 - Important actions should create audit records.
 - Do not implement facial recognition.
 - PA/public announcement is a fallback escalation workflow, not a replacement for authorised case handling.
 - Demo data must be clearly fictional and must not resemble real attendee records.
+- Public users must not see sensitive matches, staff notes, claimant contact details or finder contact details.
 
 ## Roles
 
-- Information Bureau Coordinator: dashboard access, match review, handover approval, PA escalation and analytics.
-- HelpPoint Volunteer: create missing/found reports, scan or enter SafeCard tokens, submit cases for review.
-- Leadership Viewer: read-only anonymised operational dashboard.
-- Guardian / Group Leader: optional SafeCard registration only, no staff dashboard access.
+- Information Bureau Coordinator: dashboard access, match review, handover approval, item release, PA escalation and analytics.
+- HelpPoint Volunteer: create person and item reports, record Reunite Point context, and submit cases for review.
+- Leadership Viewer: read-only aggregate operational dashboard.
+- Public Reporter / Attendee: submit reports only.
 
 ## Technical Direction
 
@@ -39,7 +43,7 @@ Core promise: every separation case should be securely captured, assisted, match
 - Lucide React icons.
 - Supabase PostgreSQL and Supabase Auth architecture.
 - IndexedDB offline mutation queue, preferably Dexie.
-- qrcode.react or equivalent for secure token QR rendering.
+- qrcode.react or equivalent for Reunite Point QR rendering.
 - Vercel-compatible deployment.
 - npm package manager.
 
@@ -48,9 +52,12 @@ Core promise: every separation case should be securely captured, assisted, match
 - Keep domain logic separate from UI components.
 - Use a service/repository abstraction so demo data can later be backed by Supabase.
 - Do not block visual prototyping on live Supabase credentials.
-- Offline capture must be real in the prototype: degraded connectivity should queue local mutations and later sync them.
-- The assisted match engine is rule-based. Do not call it AI unless actual AI is introduced and documented later.
+- Offline capture must be real in the prototype: degraded connectivity should queue local staff mutations and later sync them.
+- The assisted match engines are rule-based. Do not describe them as machine-learning unless that is introduced and documented later.
 - Human confirmation is required for suggested matches and verified handover.
+- Proof-of-ownership confirmation is required before item release.
+- Match confirmation, person handover and item release cannot complete while offline.
+- Keep the Stage 2 connectivity model software-only; do not add separate connectivity equipment to the prototype scope.
 
 ## Design Direction
 

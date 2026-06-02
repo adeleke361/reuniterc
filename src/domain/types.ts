@@ -5,26 +5,39 @@ export type StaffRole =
   | "information_bureau_coordinator"
   | "helppoint_volunteer"
   | "leadership_viewer"
-  | "guardian_group_leader";
+  | "public_reporter";
 
 export type EventStatus = "scheduled" | "active" | "completed";
-export type PersonCategory = "child" | "elderly_attendee" | "adult" | "group_member";
-export type CaseType = "missing" | "found";
-export type CaseStatus =
+export type PersonCategory = "child" | "elderly_attendee" | "vulnerable_attendee" | "group_member";
+export type PersonCaseIntent = "looking_for_person" | "found_person";
+export type ItemCaseIntent = "lost_item" | "found_item";
+export type PersonCaseStatus =
   | "pending_sync"
-  | "reported"
+  | "report_created"
   | "under_review"
-  | "match_pending_handover"
+  | "possible_match_suggested"
+  | "match_confirmed_by_information_bureau"
+  | "verified_handover_completed"
   | "safely_reunited"
+  | "closed_unresolved";
+export type ItemCaseStatus =
+  | "pending_sync"
+  | "report_created"
+  | "under_review"
+  | "possible_match_suggested"
+  | "match_confirmed_by_information_bureau"
+  | "proof_of_ownership_verified"
+  | "item_released"
   | "closed_unresolved";
 export type Urgency = "standard" | "elevated" | "urgent";
 export type MatchStatus = "suggested" | "confirmed" | "rejected";
-export type EscalationStatus = "draft" | "queued" | "announced" | "resolved" | "cancelled";
+export type EscalationStatus = "draft" | "queued" | "announced" | "cancelled";
 export type ConnectivityStatus = "stable" | "degraded";
-export type SafetyCardStatus = "active" | "revoked";
 export type OfflineOperationType =
-  | "create_missing_case"
-  | "create_found_case"
+  | "create_looking_for_person_report"
+  | "create_found_person_report"
+  | "create_lost_item_report"
+  | "create_found_item_report"
   | "draft_announcement_escalation";
 export type OfflineSyncStatus = "pending" | "synced" | "failed";
 export type MatchRecommendationTier =
@@ -32,24 +45,42 @@ export type MatchRecommendationTier =
   | "review_recommended"
   | "insufficient_confidence";
 export type AgeBand = "0-5" | "6-8" | "9-12" | "13-17" | "18-59" | "60+" | "unknown";
+export type PosterType = "A4 Poster" | "Placard" | "Billboard" | "Help Desk Sign";
 export type ProximityGroup =
-  | "auditorium"
+  | "information_bureau"
   | "arena_rear"
   | "main_gate"
-  | "transport"
+  | "c_gate"
+  | "auditorium"
   | "other";
+export type ItemCategory =
+  | "phone"
+  | "bag"
+  | "wallet"
+  | "bible_or_book"
+  | "id_or_card"
+  | "clothing"
+  | "other";
+export type AnnouncementCaseKind = "person_case" | "item_case";
 
 export type AuditEventType =
-  | "safecard.registered"
-  | "safecard.lookup"
-  | "case.created"
-  | "case.review_started"
-  | "case.synced"
-  | "match.suggested"
-  | "match.confirmed"
-  | "match.rejected"
-  | "handover.verified"
-  | "case.safely_reunited"
+  | "reunite_point.listed"
+  | "person_case.created"
+  | "person_case.review_started"
+  | "person_case.synced"
+  | "person_case.safely_reunited"
+  | "item_case.created"
+  | "item_case.review_started"
+  | "item_case.synced"
+  | "item_case.item_released"
+  | "person_match.suggested"
+  | "person_match.confirmed"
+  | "person_match.rejected"
+  | "item_match.suggested"
+  | "item_match.confirmed"
+  | "item_match.rejected"
+  | "person_handover.completed"
+  | "item_release.completed"
   | "announcement.drafted"
   | "announcement.escalated"
   | "offline.queued"
@@ -66,65 +97,70 @@ export interface Event {
   createdAt: ISODateString;
 }
 
-export interface HelpPoint {
+export interface ReunitePoint {
   id: EntityId;
   eventId: EntityId;
+  code: string;
   name: string;
   zone: string;
   proximityGroup: ProximityGroup;
   locationLabel: string;
+  posterType: PosterType;
+  officialShortUrl: string;
+  fallbackInstruction: string;
+  tamperCheckInstruction: string;
   isActive: boolean;
   createdAt: ISODateString;
+  updatedAt: ISODateString;
 }
 
-export interface StaffProfile {
+export interface ActorProfile {
   id: EntityId;
   authUserId?: EntityId;
   displayName: string;
   role: StaffRole;
-  helpPointId?: EntityId;
+  assignedPointId?: EntityId;
   isActive: boolean;
   isDemo: boolean;
   createdAt: ISODateString;
 }
 
-export interface Guardian {
+export interface PersonCase {
   id: EntityId;
   eventId: EntityId;
-  displayLabel: string;
-  relationshipLabel?: string;
-  contactHint?: string;
-  isDemo: boolean;
-  createdAt: ISODateString;
-}
-
-export interface SafetyCard {
-  id: EntityId;
-  eventId: EntityId;
-  guardianId?: EntityId;
-  tokenHash: string;
-  tokenLast4: string;
-  label?: string;
-  status: SafetyCardStatus;
-  createdAt: ISODateString;
-  revokedAt?: ISODateString;
-}
-
-export interface SeparationCase {
-  id: EntityId;
-  eventId: EntityId;
-  caseType: CaseType;
-  status: CaseStatus;
+  reportSourcePointId: EntityId;
+  caseIntent: PersonCaseIntent;
+  status: PersonCaseStatus;
   personCategory: PersonCategory;
-  approxAgeBand: AgeBand;
+  approximateAgeBand: AgeBand;
   reportedAt: ISODateString;
   lastSeenOrFoundLocation: string;
-  helpPointId: EntityId;
-  safetyCardId?: EntityId;
-  descriptionTags: string[];
+  groupOrChurchReference?: string;
+  nonSensitiveDescriptionTags: string[];
   sensitiveNotes?: string;
   urgency: Urgency;
-  createdByStaffId: EntityId;
+  publicReporterReference?: string;
+  createdByStaffId?: EntityId;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+  resolvedAt?: ISODateString;
+}
+
+export interface ItemCase {
+  id: EntityId;
+  eventId: EntityId;
+  reportSourcePointId: EntityId;
+  itemIntent: ItemCaseIntent;
+  status: ItemCaseStatus;
+  itemCategory: ItemCategory;
+  itemColorOrDescriptionTags: string[];
+  reportedAt: ISODateString;
+  lastSeenOrFoundLocation: string;
+  hiddenVerificationDetail?: string;
+  claimantReference?: string;
+  urgency: Urgency;
+  publicReporterReference?: string;
+  createdByStaffId?: EntityId;
   createdAt: ISODateString;
   updatedAt: ISODateString;
   resolvedAt?: ISODateString;
@@ -132,21 +168,26 @@ export interface SeparationCase {
 
 export interface MatchReason {
   code:
-    | "exact_safecard_token"
+    | "reunite_point_proximity"
+    | "time_proximity"
     | "person_category"
     | "age_band"
-    | "location_proximity"
-    | "time_proximity"
+    | "group_reference"
     | "description_tags"
-    | "human_verification_required";
+    | "human_verification_required"
+    | "item_category"
+    | "item_description_tags"
+    | "hidden_verification_detail"
+    | "proof_of_ownership_required";
   label: string;
   points: number;
+  staffOnly?: boolean;
 }
 
-export interface CaseMatch {
+export interface PersonMatchRecommendation {
   id: EntityId;
   eventId: EntityId;
-  missingCaseId: EntityId;
+  lookingCaseId: EntityId;
   foundCaseId: EntityId;
   score: number;
   tier: MatchRecommendationTier;
@@ -157,13 +198,27 @@ export interface CaseMatch {
   createdAt: ISODateString;
 }
 
-export interface HandoverRecord {
+export interface ItemMatchRecommendation {
+  id: EntityId;
+  eventId: EntityId;
+  lostItemCaseId: EntityId;
+  foundItemCaseId: EntityId;
+  score: number;
+  tier: MatchRecommendationTier;
+  reasons: MatchReason[];
+  status: MatchStatus;
+  reviewedByStaffId?: EntityId;
+  reviewedAt?: ISODateString;
+  createdAt: ISODateString;
+}
+
+export interface PersonHandoverRecord {
   id: EntityId;
   eventId: EntityId;
   matchId: EntityId;
-  missingCaseId: EntityId;
+  lookingCaseId: EntityId;
   foundCaseId: EntityId;
-  guardianId?: EntityId;
+  verifiedReporterReference?: string;
   verificationMethod: string;
   verificationNotes?: string;
   approvedByStaffId: EntityId;
@@ -171,48 +226,91 @@ export interface HandoverRecord {
   createdAt: ISODateString;
 }
 
+export interface ItemReleaseRecord {
+  id: EntityId;
+  eventId: EntityId;
+  matchId: EntityId;
+  lostItemCaseId: EntityId;
+  foundItemCaseId: EntityId;
+  claimantReference?: string;
+  proofOfOwnershipMethod: string;
+  proofNotes?: string;
+  releasedByStaffId: EntityId;
+  releasedAt: ISODateString;
+  createdAt: ISODateString;
+}
+
 export interface AnnouncementEscalation {
   id: EntityId;
   eventId: EntityId;
+  caseKind: AnnouncementCaseKind;
   caseId: EntityId;
   status: EscalationStatus;
   announcementText: string;
   requestedByStaffId: EntityId;
   requestedAt: ISODateString;
   announcedAt?: ISODateString;
-  resolvedAt?: ISODateString;
 }
 
 export type OfflineOperationPayload =
   | {
-      caseType: "missing";
+      caseIntent: "looking_for_person";
       eventId: EntityId;
-      helpPointId: EntityId;
+      reportSourcePointId: EntityId;
       personCategory: PersonCategory;
-      approxAgeBand: AgeBand;
+      approximateAgeBand: AgeBand;
       reportedAt: ISODateString;
-      lastSeenLocation: string;
-      descriptionTags: string[];
+      lastSeenOrFoundLocation: string;
+      groupOrChurchReference?: string;
+      nonSensitiveDescriptionTags: string[];
       sensitiveNotes?: string;
       urgency: Urgency;
-      safetyCardToken?: string;
+      publicReporterReference?: string;
     }
   | {
-      caseType: "found";
+      caseIntent: "found_person";
       eventId: EntityId;
-      helpPointId: EntityId;
+      reportSourcePointId: EntityId;
       personCategory: PersonCategory;
-      approxAgeBand: AgeBand;
+      approximateAgeBand: AgeBand;
       reportedAt: ISODateString;
-      foundLocation: string;
-      descriptionTags: string[];
+      lastSeenOrFoundLocation: string;
+      groupOrChurchReference?: string;
+      nonSensitiveDescriptionTags: string[];
       sensitiveNotes?: string;
       urgency: Urgency;
-      safetyCardToken?: string;
+      publicReporterReference?: string;
+    }
+  | {
+      itemIntent: "lost_item";
+      eventId: EntityId;
+      reportSourcePointId: EntityId;
+      itemCategory: ItemCategory;
+      itemColorOrDescriptionTags: string[];
+      reportedAt: ISODateString;
+      lastSeenOrFoundLocation: string;
+      hiddenVerificationDetail?: string;
+      claimantReference?: string;
+      urgency: Urgency;
+      publicReporterReference?: string;
+    }
+  | {
+      itemIntent: "found_item";
+      eventId: EntityId;
+      reportSourcePointId: EntityId;
+      itemCategory: ItemCategory;
+      itemColorOrDescriptionTags: string[];
+      reportedAt: ISODateString;
+      lastSeenOrFoundLocation: string;
+      hiddenVerificationDetail?: string;
+      claimantReference?: string;
+      urgency: Urgency;
+      publicReporterReference?: string;
     }
   | {
       operation: "draft_announcement_escalation";
       eventId: EntityId;
+      caseKind: AnnouncementCaseKind;
       caseId: EntityId;
       announcementText: string;
       requestedAt: ISODateString;
@@ -239,13 +337,14 @@ export interface AuditLog {
   action: AuditEventType;
   entityType:
     | "event"
-    | "help_point"
-    | "staff_profile"
-    | "guardian"
-    | "safety_card"
-    | "separation_case"
-    | "case_match"
-    | "handover_record"
+    | "reunite_point"
+    | "actor_profile"
+    | "person_case"
+    | "item_case"
+    | "person_match_recommendation"
+    | "item_match_recommendation"
+    | "person_handover_record"
+    | "item_release_record"
     | "announcement_escalation"
     | "offline_sync_operation";
   entityId?: EntityId;
@@ -255,7 +354,7 @@ export interface AuditLog {
 
 export interface DashboardHotspot {
   locationLabel: string;
-  caseCount: number;
+  reportCount: number;
 }
 
 export interface DashboardSummary {
@@ -263,13 +362,20 @@ export interface DashboardSummary {
   eventId: EntityId;
   eventName: string;
   connectivityStatus: ConnectivityStatus;
-  openMissingCases: number;
-  foundAwaitingMatch: number;
+  personReportsTotal: number;
+  itemReportsTotal: number;
+  openLookingForPersonCases: number;
+  foundPersonsAwaitingMatch: number;
+  openLostItemCases: number;
+  foundItemsAwaitingMatch: number;
   safelyReunitedTotal: number;
+  releasedItemsTotal: number;
   medianReunionMinutes: number | null;
+  medianItemReleaseMinutes: number | null;
   paEscalations: number;
   offlineReportsPendingSync: number;
-  urgentUnresolvedCases: number;
+  urgentUnresolvedPersonCases: number;
+  urgentUnresolvedItemCases: number;
   hotspots: DashboardHotspot[];
   sensitiveCaseDetailsIncluded: false;
 }

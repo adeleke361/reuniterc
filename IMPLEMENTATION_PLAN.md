@@ -10,129 +10,155 @@ Acceptance criteria:
 - No feature screens are built beyond a minimal runnable placeholder.
 - Repository is ready for dependency installation and Vercel configuration.
 
-Status: complete in this scaffold, pending dependency installation.
+Status: complete in this scaffold.
 
-## Phase 1: Domain And Demo Data Foundation
+## Phase 1: Safety Kernel
 
 Scope:
 
 - Create typed domain models.
-- Create repository interfaces for events, cases, SafeCards, matches, handovers, announcements and audit logs.
+- Create repository interfaces.
 - Implement seeded fictional demo-data adapter.
 - Implement role and permission helpers.
-- Add explicit workflow state machine and Assisted Match Engine.
-- Add unit tests for permissions, state transitions, handover safety, match scoring, PA escalation, offline sync and leadership aggregation.
+- Add explicit workflow state machine and assisted match logic.
+- Add unit tests for permissions, state transitions, handover safety, PA escalation, offline sync and leadership aggregation.
+
+Status: superseded by Phase 1B concept alignment after validation.
+
+## Phase 1B: Concept Alignment Refactor
+
+Scope:
+
+- Align ReuniteRC with the Reunite Point recovery model.
+- Remove person-attached QR identity concepts from the active prototype direction.
+- Add `ReunitePoint`, `PersonCase`, `ItemCase`, `PersonMatchRecommendation`, `ItemMatchRecommendation`, `PersonHandoverRecord` and `ItemReleaseRecord`.
+- Split matching into Person Match Engine and Item Match Engine.
+- Add proof-of-ownership verification before item release.
+- Update offline queue operation types for all four report intents.
+- Update leadership analytics to include aggregate person and item reports only.
+- Update documentation, seed data and tests.
 
 Acceptance criteria:
 
-- Demo data represents Congress Night 2026 and authorised HelpPoints.
+- Demo data represents Congress Night 2026 and Reunite Points `RP-001`, `RP-014`, `RP-002` and `RP-007`.
+- Reunite Points identify reporting locations, not people.
 - No real identities are used.
 - UI can read data through services, not hard-coded page constants.
-- Match and handover actions are audit-log-ready.
+- Person and item match actions are audit-log-ready.
 - Offline reports remain `pending_sync` until successful synchronisation.
-- Connected coordinator workflow is required for match confirmation, guardian verification and final handover closure.
-- Leadership dashboard summary is aggregate/anonymised.
+- Connected Information Bureau workflow is required for match confirmation, person handover and item release.
+- Leadership analytics are aggregate-only.
+- PA escalation never resolves a case by itself.
 
-Status: implemented in the Phase 1 safety kernel.
+Status: implemented in the Phase 1B kernel.
 
-## Phase 2: Operations Shell And Dashboard
+## Phase 2A: Operations Shell And Dashboard
 
 Scope:
 
 - Build premium command-centre layout.
-- Add simulated login role selector.
+- Add simulated role selector.
 - Add `/dashboard` with event status, metrics, recent activity, hotspots, urgent cases and connectivity status.
+- Show Reunite Point context and pending offline reports.
 - Add loading, empty and error states.
 
 Acceptance criteria:
 
 - Dashboard is responsive and visually polished.
-- Leadership viewer sees anonymised metrics only.
+- Leadership viewer sees aggregate metrics only.
 - Coordinator sees operational panels.
 - Connectivity status is visible.
+- No sensitive public data is exposed.
 
-## Phase 3: Case Capture Workflows
+## Phase 2B: Public And Staff Report Capture
 
 Scope:
 
-- Build `/cases/missing` and `/cases/found`.
+- Build report entry flows for:
+  - looking for a separated person;
+  - found person needing help;
+  - lost item;
+  - found item.
+- Use Reunite Point code or URL context.
 - Add structured validation.
-- Add SafeCard token entry.
 - Create audit entries through service layer.
 - Add success/error states.
 
 Acceptance criteria:
 
-- Staff can submit missing and found cases.
+- Public reporters can submit reports only.
+- Staff can create reports from authorised workflows.
 - Required fields are validated.
 - Sensitive notes are clearly staff-only.
-- Submitted cases appear in dashboard and match centre.
+- Submitted cases appear in dashboard and match centres.
 
-## Phase 4: SafeCard Flow
+## Phase 3: Reunite Point Management And Poster Assets
 
 Scope:
 
-- Build `/safecard`.
-- Generate secure random token client-side or server-side according to final implementation choice.
-- Render QR with token only.
-- Store token hash in repository layer.
+- Add Reunite Point records.
+- Render official short URL and point code.
+- Support poster metadata: point code, location name, fallback instruction, tamper-check instruction and official branding fields.
 
 Acceptance criteria:
 
-- QR code never contains names, phone numbers or sensitive details.
-- Token lookup works for authorised staff.
-- Revoked/inactive cards cannot be used for match scoring.
+- QR content does not include personal details.
+- Reunite Point code is visible for no-internet fallback.
+- Fake-poster risk is addressed with official branding and tamper guidance.
 
-## Phase 5: Assisted Match Centre
+## Phase 4: Assisted Match Centres
 
 Scope:
 
-- Build rule-based scoring engine.
-- Build `/matches`.
-- Display recommendation reasons.
+- Build person match centre.
+- Build item match centre.
+- Display recommendation tiers and transparent scoring reasons.
 - Allow coordinator confirmation or rejection.
 
 Acceptance criteria:
 
-- Exact SafeCard token match heavily influences score.
-- Person category, age band, location, time and tags are considered.
-- No UI claims facial recognition or AI.
+- Person scoring considers Reunite Point proximity, time, category, age, group reference and non-sensitive tags.
+- Item scoring considers category, Reunite Point or zone, time, description tags and staff-only hidden detail.
+- No UI describes the rule-based engines as machine-learning.
 - Human confirmation is required.
 
-## Phase 6: Verified Handover And PA Escalation
+## Phase 5: Verified Handover, Item Release And PA Escalation
 
 Scope:
 
-- Build `/handover/[id]`.
-- Build `/announcements`.
-- Enforce handover before safely reunited closure.
-- Add privacy-conscious PA escalation queue.
+- Build person handover workflow.
+- Build item release workflow.
+- Build PA escalation queue.
+- Enforce verification before final closure.
 
 Acceptance criteria:
 
-- A confirmed match can be closed only after verification.
-- Handover creates audit records.
+- A confirmed person match can close only after verified handover.
+- A confirmed item match can close only after proof-of-ownership verification.
 - PA escalation is available only to coordinators.
 - Announcement text avoids sensitive over-disclosure.
+- PA escalation never resolves a case.
 
-## Phase 7: Offline Queue And Sync
+## Phase 6: Offline Queue And Sync
 
 Scope:
 
 - Add Dexie IndexedDB queue.
 - Add degraded connectivity toggle.
-- Queue case submission mutations locally.
+- Queue person and item report mutations locally.
+- Queue draft PA escalation requests locally.
 - Add sync replay and status panel.
 
 Acceptance criteria:
 
-- User can create a case while degraded.
-- Case appears in pending sync state.
-- Restoring connectivity syncs the operation into demo repositories.
+- Staff can create reports while degraded if the app is already loaded.
+- Reports appear in pending sync state.
+- Restoring connectivity syncs operations into demo repositories.
 - Duplicate submissions are prevented by idempotency keys.
-- Offline mode does not allow match confirmation, guardian verification or final handover closure.
+- Offline mode does not allow match confirmation, person handover or item release.
+- Public users are not promised zero-internet digital submission if the form never loaded.
 
-## Phase 8: Supabase Integration
+## Phase 7: Supabase Integration
 
 Scope:
 
@@ -150,9 +176,9 @@ Acceptance criteria:
 - Database schema matches `DATA_MODEL.md`.
 - Staff role boundaries are enforced.
 - Build remains Vercel-compatible.
-- SafeCard raw tokens are generated server-side and only token hashes are persisted.
+- Sensitive fields are protected by RLS.
 
-## Phase 9: Analytics And Submission Assets
+## Phase 8: Analytics And Submission Assets
 
 Scope:
 
@@ -174,6 +200,7 @@ Acceptance criteria:
 - Unit tests for domain rules and match scoring.
 - Service tests for case status transitions.
 - Offline sync tests for queue, replay and idempotency.
+- Tests for aggregate-only leadership analytics.
 - Accessibility checks for critical forms.
 - Manual browser QA for desktop and mobile layouts.
 - Vercel production build verification.
@@ -183,10 +210,11 @@ Acceptance criteria:
 - Install dependencies with npm.
 - Confirm `npm run lint` passes.
 - Confirm `npm run typecheck` passes.
+- Confirm `npm run test` passes.
 - Confirm `npm run build` passes.
 - Configure Vercel project.
 - Add Supabase environment variables when live backend is available.
 - Verify no real data or credentials are committed.
-- Verify QR content contains token only.
+- Verify visible QR content contains no personal details.
 - Verify demo data is fictional.
 - Add repository URL and deployed URL to submission.
