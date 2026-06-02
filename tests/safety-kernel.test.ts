@@ -17,6 +17,7 @@ import {
   completeItemReleaseRuntime,
   completePersonHandoverRuntime,
   createInitialGuidedDemoState,
+  getGuidedDemoVisibility,
   queueOfflineDemoReport,
   resetGuidedDemoScenario,
   setGuidedDemoConnectivity
@@ -140,6 +141,7 @@ describe("rule-based match engines", () => {
     const strongMatch = matches.find((match) => match.foundCaseId === "person_found_child_candidate");
 
     assert.ok(strongMatch);
+    assert.equal(strongMatch.score, 92);
     assert.equal(strongMatch.tier, "strong_match_recommendation");
     assert.ok(strongMatch.score >= 80);
     assert.ok(strongMatch.reasons.some((reason) => reason.code === "reunite_point_proximity"));
@@ -154,6 +156,7 @@ describe("rule-based match engines", () => {
     const strongMatch = matches.find((match) => match.foundItemCaseId === "item_found_bag_candidate");
 
     assert.ok(strongMatch);
+    assert.equal(strongMatch.score, 87);
     assert.equal(strongMatch.tier, "strong_match_recommendation");
     assert.ok(strongMatch.score >= 80);
     assert.ok(strongMatch.reasons.some((reason) => reason.code === "reunite_point_proximity"));
@@ -391,13 +394,61 @@ describe("access and analytics safeguards", () => {
 describe("guided demo orchestration", () => {
   test("progresses through guided demo state", () => {
     const initialState = createInitialGuidedDemoState();
-    const afterPoint = advanceGuidedDemoStep(initialState, "view-rp014");
-    const afterMissingReport = advanceGuidedDemoStep(afterPoint, "report-missing-child");
+    const afterPoint = advanceGuidedDemoStep(initialState, "ready-rp014");
+    const afterMissingReport = advanceGuidedDemoStep(afterPoint, "missing-child-reported");
 
-    assert.equal(afterPoint.completedStepIds.includes("view-rp014"), true);
+    assert.equal(afterPoint.completedStepIds.includes("ready-rp014"), true);
     assert.equal(afterPoint.activeStepIndex, 1);
-    assert.equal(afterMissingReport.completedStepIds.includes("report-missing-child"), true);
+    assert.equal(afterMissingReport.completedStepIds.includes("missing-child-reported"), true);
     assert.equal(afterMissingReport.activeStepIndex, 2);
+  });
+
+  test("demo starts without completed outcomes or match scores", () => {
+    const visibility = getGuidedDemoVisibility(createInitialGuidedDemoState());
+
+    assert.equal(visibility.showPersonMatchScore, false);
+    assert.equal(visibility.showItemMatchScore, false);
+    assert.equal(visibility.showSafelyReunitedOutcome, false);
+    assert.equal(visibility.showItemReleaseOutcome, false);
+    assert.equal(visibility.showOfflineQueuedCount, false);
+  });
+
+  test("safely reunited is not visible before verified handover stage", () => {
+    const beforeHandover = advanceGuidedDemoStep(
+      advanceGuidedDemoStep(
+        advanceGuidedDemoStep(createInitialGuidedDemoState(), "ready-rp014"),
+        "missing-child-reported"
+      ),
+      "found-child-reported"
+    );
+    const afterMatchReview = advanceGuidedDemoStep(beforeHandover, "person-match-recommended");
+    const afterHandover = completePersonHandoverRuntime(afterMatchReview);
+
+    assert.equal(getGuidedDemoVisibility(afterMatchReview).showSafelyReunitedOutcome, false);
+    assert.equal(getGuidedDemoVisibility(afterHandover).showSafelyReunitedOutcome, true);
+  });
+
+  test("item released is not visible before proof-of-ownership release stage", () => {
+    const beforeRelease = advanceGuidedDemoStep(
+      completePersonHandoverRuntime(
+        advanceGuidedDemoStep(
+          advanceGuidedDemoStep(
+            advanceGuidedDemoStep(
+              advanceGuidedDemoStep(createInitialGuidedDemoState(), "ready-rp014"),
+              "missing-child-reported"
+            ),
+            "found-child-reported"
+          ),
+          "person-match-recommended"
+        )
+      ),
+      "safely-reunited"
+    );
+    const afterItemMatch = advanceGuidedDemoStep(beforeRelease, "item-match-recommended");
+    const afterRelease = completeItemReleaseRuntime(afterItemMatch);
+
+    assert.equal(getGuidedDemoVisibility(afterItemMatch).showItemReleaseOutcome, false);
+    assert.equal(getGuidedDemoVisibility(afterRelease).showItemReleaseOutcome, true);
   });
 
   test("blocks final handover and item release in degraded connectivity", () => {
@@ -415,7 +466,7 @@ describe("guided demo orchestration", () => {
 
     assert.equal(unchanged.offlineQueuedReports, 0);
     assert.equal(queued.offlineQueuedReports, 1);
-    assert.equal(queued.completedStepIds.includes("queue-offline-report"), true);
+    assert.equal(queued.completedStepIds.includes("offline-queue-test"), true);
   });
 
   test("reset demo scenario restores baseline", () => {

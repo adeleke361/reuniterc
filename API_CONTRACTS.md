@@ -239,7 +239,7 @@ Success:
     {
       "lookingCaseId": "person_looking_001",
       "foundCaseId": "person_found_001",
-      "score": 100,
+      "score": 92,
       "tier": "strong_match_recommendation",
       "reasons": [
         "Same or nearby Reunite Point proximity group",
@@ -286,7 +286,7 @@ Success:
     {
       "lostItemCaseId": "item_lost_001",
       "foundItemCaseId": "item_found_001",
-      "score": 100,
+      "score": 87,
       "tier": "strong_match_recommendation",
       "reasons": [
         "Same item category",
@@ -442,7 +442,7 @@ Success:
 }
 ```
 
-## Escalate To PA Announcement
+## Escalate To PA Fallback
 
 Route: `POST /api/announcements`
 
@@ -457,7 +457,7 @@ Request:
   "eventId": "evt_congress_night_2026",
   "caseKind": "person_case",
   "caseId": "person_looking_002",
-  "announcementText": "Privacy-conscious fictional announcement text.",
+  "announcementText": "Privacy-conscious fictional PA fallback text.",
   "reason": "Unresolved after coordinator review"
 }
 ```

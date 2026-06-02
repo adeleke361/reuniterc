@@ -2,62 +2,62 @@ import type { ConnectivityStatus } from "../domain/types";
 
 export const guidedDemoSteps = [
   {
-    id: "view-rp014",
-    label: "View RP-014",
+    id: "ready-rp014",
+    label: "Ready / View RP-014",
     route: "/reunite-points",
     summary: "Arena Rear Reunite Point is the reporting source."
   },
   {
-    id: "report-missing-child",
-    label: "Missing child",
+    id: "missing-child-reported",
+    label: "Missing child reported",
     route: "/report/person",
     summary: "A parent or group leader files a looking-for-person report."
   },
   {
-    id: "report-found-child",
-    label: "Found child",
+    id: "found-child-reported",
+    label: "Found child reported from RP-014",
     route: "/report/person",
-    summary: "A volunteer files a found-person report from RP-014."
+    summary: "A volunteer files a found-person report from the same Reunite Point."
   },
   {
-    id: "review-person-match",
-    label: "Person match",
+    id: "person-match-recommended",
+    label: "Person match recommended",
     route: "/matches/person",
     summary: "Information Bureau reviews a rule-based recommendation."
   },
   {
-    id: "complete-reunion",
-    label: "Safe reunion",
+    id: "guardian-group-verification",
+    label: "Guardian/group verification",
+    route: "/handover/person/person_match_demo",
+    summary: "A coordinator verifies the reporter and group context."
+  },
+  {
+    id: "safely-reunited",
+    label: "Safely Reunited",
     route: "/handover/person/person_match_demo",
     summary: "Verified handover closes the person case safely."
   },
   {
-    id: "run-item-match",
-    label: "Item match",
+    id: "item-match-recommended",
+    label: "Lost-and-found item match",
     route: "/matches/item",
     summary: "Lost and found bag reports are compared transparently."
   },
   {
-    id: "verify-item-release",
-    label: "Item release",
+    id: "item-release-verified",
+    label: "Proof-of-ownership item release",
     route: "/release/item/item_match_demo",
-    summary: "Proof of ownership is required before release."
+    summary: "Proof of ownership is required before item release."
   },
   {
-    id: "queue-offline-report",
-    label: "Offline queue",
+    id: "offline-queue-test",
+    label: "Low-connectivity/offline queue test",
     route: "/demo",
     summary: "Degraded connectivity queues staff reports for later sync."
   },
   {
-    id: "view-pa-fallback",
-    label: "PA fallback",
-    route: "/announcements",
-    summary: "PA remains a trusted fallback and never resolves a case by itself."
-  },
-  {
     id: "leadership-outcome",
-    label: "Leadership view",
+    label: "Leadership outcome",
     route: "/analytics",
     summary: "Leadership sees aggregate outcomes only."
   }
@@ -72,6 +72,19 @@ export interface GuidedDemoRuntimeState {
   offlineQueuedReports: number;
   personHandoverCompleted: boolean;
   itemReleaseCompleted: boolean;
+}
+
+export interface GuidedDemoVisibility {
+  showMissingReport: boolean;
+  showFoundReport: boolean;
+  showPersonMatchScore: boolean;
+  showVerification: boolean;
+  showSafelyReunitedOutcome: boolean;
+  showItemMatchScore: boolean;
+  showItemReleaseOutcome: boolean;
+  showOfflineQueue: boolean;
+  showOfflineQueuedCount: boolean;
+  showLeadershipOutcome: boolean;
 }
 
 export function createInitialGuidedDemoState(): GuidedDemoRuntimeState {
@@ -92,7 +105,7 @@ export function advanceGuidedDemoStep(
   const completedStepIds = state.completedStepIds.includes(stepId)
     ? state.completedStepIds
     : [...state.completedStepIds, stepId];
-  const stepIndex = guidedDemoSteps.findIndex((step) => step.id === stepId);
+  const stepIndex = getGuidedDemoStepIndex(stepId);
   const nextIndex = Math.min(
     guidedDemoSteps.length - 1,
     Math.max(state.activeStepIndex, stepIndex + 1)
@@ -125,7 +138,7 @@ export function queueOfflineDemoReport(state: GuidedDemoRuntimeState): GuidedDem
       ...state,
       offlineQueuedReports: state.offlineQueuedReports + 1
     },
-    "queue-offline-report"
+    "offline-queue-test"
   );
 }
 
@@ -149,7 +162,7 @@ export function completePersonHandoverRuntime(
       ...state,
       personHandoverCompleted: true
     },
-    "complete-reunion"
+    "guardian-group-verification"
   );
 }
 
@@ -163,8 +176,36 @@ export function completeItemReleaseRuntime(state: GuidedDemoRuntimeState): Guide
       ...state,
       itemReleaseCompleted: true
     },
-    "verify-item-release"
+    "item-release-verified"
   );
+}
+
+export function getGuidedDemoVisibility(state: GuidedDemoRuntimeState): GuidedDemoVisibility {
+  return {
+    showMissingReport: isAtOrPastStep(state, "missing-child-reported"),
+    showFoundReport: isAtOrPastStep(state, "found-child-reported"),
+    showPersonMatchScore: isAtOrPastStep(state, "person-match-recommended"),
+    showVerification: isAtOrPastStep(state, "guardian-group-verification"),
+    showSafelyReunitedOutcome:
+      state.personHandoverCompleted && isAtOrPastStep(state, "safely-reunited"),
+    showItemMatchScore: isAtOrPastStep(state, "item-match-recommended"),
+    showItemReleaseOutcome:
+      state.itemReleaseCompleted && isAtOrPastStep(state, "offline-queue-test"),
+    showOfflineQueue: isAtOrPastStep(state, "offline-queue-test"),
+    showOfflineQueuedCount: isAtOrPastStep(state, "offline-queue-test"),
+    showLeadershipOutcome: isAtOrPastStep(state, "leadership-outcome")
+  };
+}
+
+export function getGuidedDemoStepIndex(stepId: GuidedDemoStepId): number {
+  return guidedDemoSteps.findIndex((step) => step.id === stepId);
+}
+
+export function isAtOrPastStep(
+  state: GuidedDemoRuntimeState,
+  stepId: GuidedDemoStepId
+): boolean {
+  return state.activeStepIndex >= getGuidedDemoStepIndex(stepId);
 }
 
 export function resetGuidedDemoScenario(): GuidedDemoRuntimeState {

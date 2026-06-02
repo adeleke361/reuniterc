@@ -109,7 +109,7 @@ export function scorePotentialPersonMatch(
 
   reasons.push(HUMAN_VERIFICATION_REASON);
 
-  const score = capScore(reasons);
+  const score = Math.min(capScore(reasons), 92);
 
   return {
     eventId: lookingCase.eventId,
@@ -197,7 +197,7 @@ export function scorePotentialItemMatch(
 
   reasons.push(PROOF_OF_OWNERSHIP_REASON);
 
-  const score = capScore(reasons);
+  const score = Math.min(capScore(reasons), 87);
 
   return {
     eventId: lostItemCase.eventId,

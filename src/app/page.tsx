@@ -28,6 +28,9 @@ export default async function Home() {
             <p className="mt-5 max-w-3xl text-xl leading-8 text-muted">
               Digital Reunification and Lost-and-Found solution for Major Programmes in Redemption City.
             </p>
+            <p className="mt-4 max-w-3xl text-2xl font-semibold leading-9 text-cyan">
+              No one should get lost in the crowd. No case should get lost in the process.
+            </p>
             <p className="mt-5 max-w-3xl leading-7 text-muted">
               Official Reunite Points turn trusted camp locations into structured reporting points while the
               Information Bureau manages matching, verification, release and PA fallback.

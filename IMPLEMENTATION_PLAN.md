@@ -63,6 +63,7 @@ Scope:
 - Add guided Congress Night demo flow.
 - Add Reunite Point poster previews.
 - Add report, match, handover, item release, PA fallback and leadership routes.
+- Polish guided demo sequencing, poster export and demo-stability fixes for Stage 2 prototype readiness.
 
 Acceptance criteria:
 
@@ -73,8 +74,10 @@ Acceptance criteria:
 - No sensitive public data is exposed.
 - Degraded connectivity blocks final reunion and item release in the prototype.
 - Reset Demo restores baseline runtime state.
+- `/demo` starts without completed outcomes, reveals match scores only at match review and reveals Safely Reunited or Item Released only after verification.
+- `/reunite-points` can print the selected poster, export the selected poster as PNG, copy the short URL and print all posters.
 
-Status: completed as the Phase 2A guided prototype experience.
+Status: completed as the Phase 2A.2 guided prototype readiness experience.
 
 ## Phase 2B: Public And Staff Report Capture
 
@@ -105,6 +108,7 @@ Scope:
 - Add Reunite Point records.
 - Render official short URL and point code.
 - Support poster metadata: point code, location name, fallback instruction, tamper-check instruction and official branding fields.
+- Poster print and selected PNG export are already available from the Phase 2A.2 prototype route.
 
 Acceptance criteria:
 
@@ -197,6 +201,7 @@ Acceptance criteria:
 
 - Metrics support Stage 2 judging story.
 - Judges can understand value proposition, stack and demo scenario.
+- Stage 2 prototype readiness is documented with guided demo behaviour and poster export capability.
 - Deployment URL and GitHub URL are ready for submission.
 
 ## Test Plan

@@ -5,8 +5,8 @@
 | Route | Primary role | Purpose |
 | --- | --- | --- |
 | `/` | Judge / public viewer | Premium product entry and demo launch |
-| `/demo` | Judge / coordinator | Guided Congress Night 2026 simulation |
-| `/reunite-points` | Coordinator / volunteer | Printable Reunite Point poster previews |
+| `/demo` | Judge / coordinator | Guided Congress Night 2026 simulation with staged outcome reveal |
+| `/reunite-points` | Coordinator / volunteer | Reunite Point poster generator with print, PNG export and short URL copy |
 | `/report/person` | Public reporter / staff | Looking-for-person and found-person report capture |
 | `/report/item` | Public reporter / staff | Lost-item and found-item report capture |
 | `/matches/person` | Information Bureau Coordinator | Person match review with transparent rule reasons |
@@ -19,16 +19,26 @@
 
 ## Guided Demo Flow
 
-1. View Reunite Point `RP-014` Arena Rear.
-2. Report a fictional missing child.
-3. Report a fictional found child from `RP-014`.
-4. Review the rule-based person match recommendation.
-5. Complete verified reunion.
-6. Review the lost/found bag match.
-7. Complete proof-of-ownership item release.
-8. Toggle degraded connectivity and queue a staff report.
-9. View PA fallback.
-10. View aggregate leadership outcome.
+1. Ready / View `RP-014`.
+2. Missing child reported.
+3. Found child reported from `RP-014`.
+4. Person match recommended.
+5. Guardian/group verification.
+6. Safely Reunited.
+7. Lost-and-found item match.
+8. Proof-of-ownership item release.
+9. Low-connectivity/offline queue test.
+10. Leadership outcome.
+
+The demo starts without completed outcomes. Match scores appear only at match review, Safely Reunited appears only after verified handover, Item Released appears only after proof-of-ownership verification, and offline queued report count appears only during the offline queue test.
+
+## Poster Generator
+
+- Print selected poster.
+- Download selected poster as PNG.
+- Copy short URL.
+- Print all posters.
+- Poster content includes ReuniteRC branding, QR representation, Point Code, location name, realistic short URL, no-internet fallback instruction and tamper-check guidance.
 
 ## Role Boundaries
 
@@ -44,5 +54,11 @@
 - Person reunion requires verified handover.
 - Item release requires proof of ownership.
 - Degraded connectivity blocks final person reunion and item release.
-- PA fallback does not automatically resolve cases.
+- Public announcement fallback does not automatically resolve cases.
 - Leadership analytics omit sensitive details.
+
+## Stage 2 Prototype Readiness
+
+- Guided demo behaviour is sequenced for judging.
+- Poster export supports operational handouts.
+- Demo data is fictional and visible case handling stays within authorised workflows.

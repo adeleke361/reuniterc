@@ -58,7 +58,7 @@ export const demoData: DemoDataSet = {
       proximityGroup: "information_bureau",
       locationLabel: "Behind the auditorium",
       posterType: "Help Desk Sign",
-      officialShortUrl: "https://rc.example/rp001",
+      officialShortUrl: "https://reuniterc.app/rp001",
       fallbackInstruction,
       tamperCheckInstruction,
       isActive: true,
@@ -74,7 +74,7 @@ export const demoData: DemoDataSet = {
       proximityGroup: "arena_rear",
       locationLabel: "Arena Rear access walkway",
       posterType: "Placard",
-      officialShortUrl: "https://rc.example/rp014",
+      officialShortUrl: "https://reuniterc.app/rp014",
       fallbackInstruction,
       tamperCheckInstruction,
       isActive: true,
@@ -90,7 +90,7 @@ export const demoData: DemoDataSet = {
       proximityGroup: "main_gate",
       locationLabel: "Main Gate welcome corridor",
       posterType: "A4 Poster",
-      officialShortUrl: "https://rc.example/rp002",
+      officialShortUrl: "https://reuniterc.app/rp002",
       fallbackInstruction,
       tamperCheckInstruction,
       isActive: true,
@@ -106,7 +106,7 @@ export const demoData: DemoDataSet = {
       proximityGroup: "c_gate",
       locationLabel: "C Gate shuttle side",
       posterType: "Billboard",
-      officialShortUrl: "https://rc.example/rp007",
+      officialShortUrl: "https://reuniterc.app/rp007",
       fallbackInstruction,
       tamperCheckInstruction,
       isActive: true,
@@ -361,7 +361,7 @@ export const demoData: DemoDataSet = {
       eventId: DEMO_EVENT_ID,
       lookingCaseId: "person_looking_child_completed",
       foundCaseId: "person_found_child_completed",
-      score: 90,
+      score: 92,
       tier: "strong_match_recommendation",
       reasons: [
         {
@@ -387,7 +387,7 @@ export const demoData: DemoDataSet = {
       eventId: DEMO_EVENT_ID,
       lostItemCaseId: "item_lost_bible_completed",
       foundItemCaseId: "item_found_bible_completed",
-      score: 95,
+      score: 87,
       tier: "strong_match_recommendation",
       reasons: [
         {

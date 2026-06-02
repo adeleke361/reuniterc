@@ -34,3 +34,33 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #061416 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  [data-poster-card="true"] {
+    break-inside: avoid;
+    box-shadow: none !important;
+    margin: 0 0 16mm;
+    page-break-inside: avoid;
+  }
+
+  .print-selected {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}

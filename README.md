@@ -2,7 +2,9 @@
 
 ReuniteRC is a digital reunification and lost-and-found solution for major programmes in Redemption City.
 
-It is being built for Kingdom Hack 3.0 as a civic safety platform prototype that strengthens the existing Information Bureau and PA announcement workflow.
+It is being built for Kingdom Hack 3.0 as a civic safety platform prototype that strengthens the existing Information Bureau and PA fallback workflow.
+
+No one should get lost in the crowd. No case should get lost in the process.
 
 ## Product Promise
 
@@ -10,13 +12,13 @@ Every separation or lost-and-found case should be securely captured, assisted, m
 
 ## Phase 2A Prototype
 
-Phase 2A builds a guided, interactive Congress Night 2026 demo around the final Reunite Point model.
+Phase 2A builds a guided, interactive Congress Night 2026 demo around the final Reunite Point model. Phase 2A.2 adds demo polish for Stage 2 prototype readiness: the `/demo` route now reveals outcomes step-by-step, and Reunite Point posters can be printed, copied and exported as PNG assets.
 
 Built routes:
 
 - `/`: premium landing page and demo launch.
 - `/demo`: guided Congress Night simulation.
-- `/reunite-points`: printable Reunite Point poster previews.
+- `/reunite-points`: Reunite Point poster generator with print, selected PNG export and short URL copy controls.
 - `/report/person`: looking-for-person and found-person report capture.
 - `/report/item`: lost-item and found-item report capture.
 - `/matches/person`: Information Bureau person match review.
@@ -31,14 +33,15 @@ Built routes:
 
 1. Open `/demo`.
 2. Start at Reunite Point `RP-014` Arena Rear.
-3. Review the fictional missing-child and found-child reports.
-4. Open `/matches/person` and inspect the rule-based match score and reasons.
-5. Complete verified handover from `/handover/person/person_match_demo`.
-6. Open `/matches/item` for the lost/found bag recommendation.
-7. Complete proof-of-ownership release from `/release/item/item_match_demo`.
-8. Toggle degraded connectivity in `/demo` and queue a report.
-9. Confirm that final reunion and item release are blocked while degraded.
-10. Open `/announcements` for PA fallback and `/analytics` for aggregate leadership outcomes.
+3. Progress through missing-child report, found-child report from `RP-014`, person match recommendation, guardian/group verification and Safely Reunited.
+4. Continue through lost-and-found item match and proof-of-ownership item release.
+5. Toggle degraded connectivity in `/demo` and queue a report.
+6. Confirm that final reunion and item release are blocked while degraded.
+7. Open `/announcements` for public announcement fallback and `/analytics` for aggregate leadership outcomes.
+
+The guided demo does not show match scores before the match review step, does not show Safely Reunited before verified handover, does not show Item Released before proof-of-ownership verification and does not surface offline queued report count before the offline queue test.
+
+The rule-based recommendation scores are intentionally realistic demo values: `92` for the person match and `87` for the item match.
 
 ## Safety Principles
 
@@ -48,7 +51,7 @@ Built routes:
 - Sensitive case details are authorised-staff information.
 - No public live tracking of vulnerable persons.
 - No facial recognition.
-- PA announcement is a fallback escalation workflow.
+- Public announcement fallback is an escalation workflow.
 - Safe reunion requires verified handover.
 - Item release requires proof-of-ownership verification.
 - Final reunion and item release are blocked offline.
