@@ -15,8 +15,8 @@ export default async function PersonHandoverPage({ params }: PersonHandoverPageP
   return (
     <AppShell
       eyebrow="Verified handover"
-      title="Safely reunited workflow"
-      subtitle="The person case can close only after Information Bureau verification. Final closure is blocked while connectivity is degraded."
+      title="Verified Person Handover"
+      subtitle="Staff verification is required before reunion. The person case can close only after Information Bureau verification, and final closure is blocked while connectivity is degraded."
     >
       <PersonHandoverWorkflow
         match={scenario.match}

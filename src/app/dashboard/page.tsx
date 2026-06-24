@@ -1,4 +1,4 @@
-import { Activity, Bell, CheckCircle2, MapPinned, PackageCheck, ShieldCheck, WifiOff } from "lucide-react";
+import { Bell, CheckCircle2, ClipboardCheck, MapPinned, PackageCheck, SearchCheck, ShieldCheck } from "lucide-react";
 import { ActivityTimeline } from "../../components/activity-timeline";
 import { AppShell } from "../../components/app-shell";
 import { CaseStatusBadge } from "../../components/case-status-badge";
@@ -6,43 +6,62 @@ import { MetricCard } from "../../components/metric-card";
 import { OfflineQueuePanel } from "../../components/offline-queue-panel";
 import { PriorityBadge } from "../../components/priority-badge";
 import { getDemoScenarioSnapshot } from "../../demo/scenario-data";
-import { formatMinutes, titleCase } from "../../lib/format";
 
 export default async function DashboardPage() {
   const snapshot = await getDemoScenarioSnapshot();
   const dashboard = snapshot.dashboard;
+  const newReports = [
+    ...snapshot.personCases
+      .filter((personCase) => personCase.status === "report_created" || personCase.status === "under_review")
+      .map((personCase) => ({
+        id: personCase.id,
+        label: personIntentLabel(personCase.caseIntent),
+        location: personCase.lastSeenOrFoundLocation,
+        status: personCase.status,
+        urgency: personCase.urgency
+      })),
+    ...snapshot.itemCases
+      .filter((itemCase) => itemCase.status === "report_created" || itemCase.status === "under_review")
+      .map((itemCase) => ({
+        id: itemCase.id,
+        label: itemIntentLabel(itemCase.itemIntent),
+        location: itemCase.lastSeenOrFoundLocation,
+        status: itemCase.status,
+        urgency: itemCase.urgency
+      }))
+  ];
+  const likelyMatches = snapshot.personRecommendations.length + snapshot.itemRecommendations.length;
+  const needsVerification = likelyMatches;
+  const paQueue = snapshot.announcements.length;
+  const resolvedCases = dashboard.safelyReunitedTotal + dashboard.releasedItemsTotal;
 
   return (
     <AppShell
       eyebrow="Information Bureau"
-      title="Command dashboard"
-      subtitle="Operational view for active Reunite Points, person cases, item cases, match recommendations, PA fallback and offline queue status."
+      title="Information Bureau Dashboard"
+      subtitle="Command center for new reports, likely matches, verification work, PA escalation queue, resolved cases, and offline sync status."
     >
       <div className="space-y-7">
-        <section className="grid gap-4 md:grid-cols-4">
-          <MetricCard label="Open person cases" value={dashboard.openLookingForPersonCases + dashboard.foundPersonsAwaitingMatch} tone="cyan" icon={ShieldCheck} />
-          <MetricCard label="Open item cases" value={dashboard.openLostItemCases + dashboard.foundItemsAwaitingMatch} tone="cyan" icon={PackageCheck} />
-          <MetricCard label="Safely reunited" value={dashboard.safelyReunitedTotal} detail={formatMinutes(dashboard.medianReunionMinutes)} tone="emerald" icon={CheckCircle2} />
-          <MetricCard label="Offline queued" value={dashboard.offlineReportsPendingSync} tone="amber" icon={WifiOff} />
-        </section>
-        <section className="grid gap-4 md:grid-cols-4">
-          <MetricCard label="Person matches" value={snapshot.personRecommendations.length} detail="Review queue" tone="amber" icon={Activity} />
-          <MetricCard label="Item matches" value={snapshot.itemRecommendations.length} detail="Review queue" tone="amber" icon={Activity} />
-          <MetricCard label="Items released" value={dashboard.releasedItemsTotal} detail={formatMinutes(dashboard.medianItemReleaseMinutes)} tone="emerald" icon={PackageCheck} />
-          <MetricCard label="PA escalations" value={dashboard.paEscalations} tone="amber" icon={Bell} />
+        <section className="grid gap-4 md:grid-cols-5">
+          <MetricCard label="New Reports" value={newReports.length} detail="Awaiting Bureau review" tone="cyan" icon={ClipboardCheck} />
+          <MetricCard label="Likely Matches" value={likelyMatches} detail="Staff review queue" tone="amber" icon={SearchCheck} />
+          <MetricCard label="Needs Verification" value={needsVerification} detail="Before handover or release" tone="red" icon={ShieldCheck} />
+          <MetricCard label="PA Escalation Queue" value={paQueue} detail="Fallback after review" tone="amber" icon={Bell} />
+          <MetricCard label="Resolved Cases" value={resolvedCases} detail={`${dashboard.safelyReunitedTotal} reunited / ${dashboard.releasedItemsTotal} released`} tone="emerald" icon={CheckCircle2} />
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
           <article className="border border-border bg-panel/90 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Priority cases</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">New Reports</p>
+            <h2 className="mt-2 text-2xl font-semibold">Reports awaiting Information Bureau review</h2>
             <div className="mt-5 space-y-3">
-              {snapshot.personCases.slice(0, 4).map((personCase) => (
-                <div key={personCase.id} className="border border-border bg-panel-strong p-4">
+              {newReports.slice(0, 5).map((report) => (
+                <div key={report.id} className="border border-border bg-panel-strong p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="font-semibold">{titleCase(personCase.caseIntent)} - {personCase.lastSeenOrFoundLocation}</p>
+                    <p className="font-semibold">{report.label} - {report.location}</p>
                     <div className="flex flex-wrap gap-2">
-                      <PriorityBadge urgency={personCase.urgency} />
-                      <CaseStatusBadge status={personCase.status} />
+                      <PriorityBadge urgency={report.urgency} />
+                      <CaseStatusBadge status={report.status} />
                     </div>
                   </div>
                 </div>
@@ -50,7 +69,37 @@ export default async function DashboardPage() {
             </div>
           </article>
           <article className="border border-border bg-panel/90 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Likely Matches</p>
+            <h2 className="mt-2 text-2xl font-semibold">Staff review required</h2>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              ReuniteRC compares new reports with existing cases and shows likely matches for Information Bureau staff to review.
+            </p>
+            <div className="mt-5 space-y-3">
+              <div className="flex items-center justify-between border border-border bg-panel-strong p-4">
+                <div>
+                  <p className="font-semibold">Person Match Review</p>
+                  <p className="mt-1 text-sm text-muted">{snapshot.personRecommendations.length} likely match</p>
+                </div>
+                <SearchCheck className="size-5 text-amber-soft" aria-hidden="true" />
+              </div>
+              <div className="flex items-center justify-between border border-border bg-panel-strong p-4">
+                <div>
+                  <p className="font-semibold">Item Match Review</p>
+                  <p className="mt-1 text-sm text-muted">{snapshot.itemRecommendations.length} likely match</p>
+                </div>
+                <PackageCheck className="size-5 text-amber-soft" aria-hidden="true" />
+              </div>
+              <div className="border border-amber/35 bg-amber/10 p-4 text-sm font-semibold leading-6 text-amber-soft">
+                Staff verification is required before reunion or item release.
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <article className="border border-border bg-panel/90 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Active Reunite Points</p>
+            <h2 className="mt-2 text-2xl font-semibold">Reporting locations</h2>
             <div className="mt-5 space-y-3">
               {snapshot.reunitePoints.map((point) => (
                 <div key={point.id} className="flex items-center justify-between border border-border bg-panel-strong p-4">
@@ -63,13 +112,35 @@ export default async function DashboardPage() {
               ))}
             </div>
           </article>
+          <OfflineQueuePanel operations={snapshot.pendingOffline} />
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-          <OfflineQueuePanel operations={snapshot.pendingOffline} />
+          <article className="border border-border bg-panel/90 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Resolved Cases</p>
+            <h2 className="mt-2 text-2xl font-semibold">Verified outcomes only</h2>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="border border-emerald-400/30 bg-emerald-400/10 p-4">
+                <p className="text-3xl font-semibold text-emerald-300">{dashboard.safelyReunitedTotal}</p>
+                <p className="mt-2 text-sm font-semibold text-muted">Safely reunited after handover verification</p>
+              </div>
+              <div className="border border-emerald-400/30 bg-emerald-400/10 p-4">
+                <p className="text-3xl font-semibold text-emerald-300">{dashboard.releasedItemsTotal}</p>
+                <p className="mt-2 text-sm font-semibold text-muted">Items released after proof-of-ownership verification</p>
+              </div>
+            </div>
+          </article>
           <ActivityTimeline auditLogs={snapshot.auditLogs} />
         </section>
       </div>
     </AppShell>
   );
+}
+
+function personIntentLabel(intent: string) {
+  return intent === "looking_for_person" ? "Report a Missing Person" : "Report a Found Person";
+}
+
+function itemIntentLabel(intent: string) {
+  return intent === "lost_item" ? "Report a Lost Item" : "Report a Found Item";
 }

@@ -7,9 +7,9 @@ export default async function DemoPage() {
 
   return (
     <AppShell
-      eyebrow="Guided simulation"
-      title="Arena Rear care flow"
-      subtitle="Walk through one fictional Information Bureau incident with calm reporting, transparent review, verified handover, item release, offline queueing, PA fallback and aggregate leadership outcome."
+      eyebrow="Judge Walkthrough"
+      title="ReuniteRC Walkthrough"
+      subtitle="Walk through one fictional Information Bureau case from Reunite Point report to likely match review, staff verification, item release, offline queueing, PA escalation, and leadership analytics."
     >
       <DemoControlPanel snapshot={snapshot} />
     </AppShell>

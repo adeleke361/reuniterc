@@ -8,8 +8,8 @@ export default async function ReunitePointsPage() {
   return (
     <AppShell
       eyebrow="Reunite Points"
-      title="Operational poster generator"
-      subtitle="Prepare printable Reunite Point posters with a visible Point Code, location name, short URL, no-internet fallback instruction and tamper-check guidance for the Information Bureau support flow."
+      title="Reunite Point Posters"
+      subtitle="Prepare official Reunite Point posters with a visible Point Code, location name, short URL, no-internet fallback instruction and tamper-check guidance."
     >
       <ReunitePointPosterStudio points={snapshot.reunitePoints} />
     </AppShell>

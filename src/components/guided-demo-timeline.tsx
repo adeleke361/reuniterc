@@ -34,7 +34,7 @@ export function GuidedDemoTimeline({ state }: GuidedDemoTimelineProps) {
               </div>
               <p className="mt-3 font-semibold">{revealed ? step.label : "Upcoming step"}</p>
               <p className="mt-2 text-xs leading-5 text-muted">
-                {revealed ? step.summary : "Stage details unlock as the guided demo progresses."}
+                {revealed ? step.summary : "Step details unlock as the walkthrough progresses."}
               </p>
             </>
           );

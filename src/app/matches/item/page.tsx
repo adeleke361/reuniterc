@@ -9,8 +9,8 @@ export default async function ItemMatchesPage() {
   return (
     <AppShell
       eyebrow="Information Bureau"
-      title="Item match review"
-      subtitle="Lost-item and found-item reports are compared with transparent rules. Proof of ownership remains required before release."
+      title="Item Match Review"
+      subtitle="ReuniteRC compares new reports with existing cases and shows likely matches for Information Bureau staff to review. Proof-of-ownership verification is required before item release."
     >
       <div className="space-y-5">
         {snapshot.itemRecommendations.map((recommendation) => {
@@ -26,9 +26,9 @@ export default async function ItemMatchesPage() {
               score={recommendation.score}
               tier={recommendation.tier}
               reasons={recommendation.reasons}
-              footer="Proof of ownership required before release."
+              footer="Proof-of-ownership verification is required before item release."
               actionHref={`/release/item/${recommendation.id}`}
-              actionLabel="Verify release"
+              actionLabel="Verify item release"
             />
           );
         })}

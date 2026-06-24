@@ -73,7 +73,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
               <StagePanel
                 icon={MapPinned}
                 title={`${arenaPoint.code} ${arenaPoint.zone}`}
-                body={`${arenaPoint.name} is the official reporting point for this fictional demo. Families and volunteers can still read out the printed Point Code if the QR form cannot load.`}
+                body={`${arenaPoint.name} is the official reporting point for this walkthrough. Families and volunteers can still read out the printed Point Code if the QR form cannot load.`}
                 actionLabel="Confirm RP-014 viewed"
                 onAction={() => completeStep("ready-rp014")}
                 href="/reunite-points"
@@ -83,7 +83,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             {currentStep?.id === "missing-child-reported" && missingCase && (
               <CaseStage
                 title="Missing child reported"
-                body="A parent or group leader has calmly submitted a fictional looking-for-person report from Arena Rear."
+                body="A parent or group leader has submitted a looking-for-person report from Arena Rear."
                 status={missingCase.status}
                 urgency={missingCase.urgency}
                 location={missingCase.lastSeenOrFoundLocation}
@@ -95,7 +95,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             {currentStep?.id === "found-child-reported" && foundCase && (
               <CaseStage
                 title="Found child reported from RP-014"
-                body="A volunteer has filed a fictional found-person report from the same Reunite Point, keeping the child with authorised support."
+                body="A volunteer has filed a found-person report from the same Reunite Point, keeping the child with authorised support."
                 status={foundCase.status}
                 urgency={foundCase.urgency}
                 location={foundCase.lastSeenOrFoundLocation}
@@ -113,7 +113,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                   score={personMatch.score}
                   tier={personMatch.tier}
                   reasons={personMatch.reasons}
-                  footer="Human verification required before reunion."
+                  footer="Staff verification is required before reunion."
                   actionHref="/matches/person"
                   actionLabel="Open match review"
                 />
@@ -143,8 +143,8 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
               <OutcomeStage
                 icon={CheckCircle2}
                 title="Safely Reunited"
-                body="Verified handover is complete. The fictional person case can now be counted as safely reunited."
-                actionLabel="Run lost-and-found item match"
+                body="Verified handover is complete. The person case can now be counted as safely reunited."
+                actionLabel="Review item match"
                 onAction={() => completeStep("safely-reunited")}
               />
             )}
@@ -158,7 +158,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                   score={itemMatch.score}
                   tier={itemMatch.tier}
                   reasons={itemMatch.reasons}
-                  footer="Proof of ownership required before release."
+                  footer="Proof-of-ownership verification is required before item release."
                   actionHref="/matches/item"
                   actionLabel="Open item review"
                 />
@@ -194,7 +194,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                   />
                 )}
                 <section className="border border-amber-300/45 bg-amber-200/10 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">Low-connectivity test</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">Low-connectivity mode</p>
                   <h3 className="mt-2 text-2xl font-semibold text-white">Queue a staff report offline</h3>
                   <p className="mt-3 leading-7 text-blue-100/75">
                     Authorised staff who already loaded the app can queue reports while degraded. Match confirmation,
@@ -219,7 +219,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             {currentStep?.id === "leadership-outcome" && (
               <StagePanel
                 icon={ClipboardCheck}
-                title="Leadership outcome"
+                title="Leadership Analytics"
                 body="Leadership receives aggregate-only insight and an operational recommendation for Arena Rear volunteer coverage."
                 actionLabel="Open leadership analytics"
                 onAction={() => completeStep("leadership-outcome")}
@@ -239,13 +239,13 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             No one should get lost in the crowd. No case should get lost in the process.
           </h2>
           <p className="mt-4 text-sm leading-6 text-blue-100/75">
-            This guided sequence uses fictional demo data to show how a trusted Information Bureau workflow can be supported with structure and care.
+            This judge walkthrough uses fictional records to show how a trusted Information Bureau workflow can be supported with structure and care.
           </p>
           <div className="mt-5 space-y-3 text-sm text-blue-100/70">
             <p>Online mode: scan a Reunite Point and submit digitally.</p>
             <p>Staff offline mode: queue reports after the app has already loaded.</p>
             <p>No-internet fallback: report the printed Point Code to official staff.</p>
-            <p>PA fallback: public announcement support remains available for urgent or unresolved cases.</p>
+            <p>PA fallback: urgent cases can be escalated immediately. Unresolved cases can be moved to the PA queue after review.</p>
           </div>
         </article>
       </section>

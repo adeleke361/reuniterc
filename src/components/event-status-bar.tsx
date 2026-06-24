@@ -8,8 +8,8 @@ export function EventStatusBar() {
       <div className="flex items-center gap-3">
         <CalendarClock className="size-5 text-cyan" aria-hidden="true" />
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-muted">Active event</p>
-          <p className="font-semibold">Congress Night 2026</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Active programme</p>
+          <p className="font-semibold">Redemption City Major Programme</p>
         </div>
       </div>
       <div className="flex items-center gap-3">
@@ -23,7 +23,7 @@ export function EventStatusBar() {
         <RadioTower className="size-5 text-amber" aria-hidden="true" />
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Fallback</p>
-          <p className="font-semibold">Point Code + PA queue</p>
+          <p className="font-semibold">Verification + PA queue</p>
         </div>
       </div>
       <div className="flex items-center gap-3 md:justify-end">

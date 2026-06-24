@@ -23,7 +23,7 @@ export function ReunitePointPoster({ point, featured = false, domId }: ReunitePo
       <div className="bg-[#0b2d63] px-5 py-3 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-black">ReuniteRC</p>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-100">Information Bureau support layer</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-100">Digital Information Bureau</p>
         </div>
       </div>
       <div className="h-2 bg-gradient-to-r from-red-700 via-white to-[#0b2d63]" />

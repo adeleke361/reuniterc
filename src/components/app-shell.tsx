@@ -1,16 +1,17 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { Activity, BarChart3, Bell, ClipboardList, MapPinned, Radar, ShieldCheck } from "lucide-react";
+import { Activity, BarChart3, Bell, ClipboardList, MapPinned, Radar, ShieldCheck, SquarePen } from "lucide-react";
 import { EventStatusBar } from "./event-status-bar";
 
 const navItems = [
-  { href: "/demo", label: "Demo", icon: Radar },
-  { href: "/reunite-points", label: "Points", icon: MapPinned },
-  { href: "/dashboard", label: "Dashboard", icon: Activity },
-  { href: "/matches/person", label: "Person Matches", icon: ShieldCheck },
-  { href: "/matches/item", label: "Item Matches", icon: ClipboardList },
-  { href: "/announcements", label: "PA Queue", icon: Bell },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 }
+  { href: "/report", label: "Report", icon: SquarePen },
+  { href: "/dashboard", label: "Bureau Dashboard", icon: Activity },
+  { href: "/reunite-points", label: "Reunite Points", icon: MapPinned },
+  { href: "/matches/person", label: "Person Review", icon: ShieldCheck },
+  { href: "/matches/item", label: "Item Review", icon: ClipboardList },
+  { href: "/announcements", label: "PA Escalation", icon: Bell },
+  { href: "/analytics", label: "Leadership Analytics", icon: BarChart3 },
+  { href: "/demo", label: "Judge Walkthrough", icon: Radar }
 ];
 
 interface AppShellProps {
@@ -33,7 +34,7 @@ export function AppShell({ children, eyebrow, title, subtitle, actions }: AppShe
             </span>
             <span>
               <span className="block text-lg font-semibold">ReuniteRC</span>
-              <span className="block text-xs text-muted">Information Bureau support layer</span>
+              <span className="block text-xs text-muted">Digital Information Bureau</span>
             </span>
           </Link>
           <nav className="flex flex-wrap items-center gap-2 text-sm text-muted">

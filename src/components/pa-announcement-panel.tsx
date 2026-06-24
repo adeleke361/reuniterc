@@ -13,7 +13,7 @@ export function PAAnnouncementPanel({ announcements }: PAAnnouncementPanelProps)
         <BellRing className="size-5 text-amber-soft" aria-hidden="true" />
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-soft">PA fallback</p>
-          <h2 className="text-2xl font-semibold">PA fallback queue</h2>
+          <h2 className="text-2xl font-semibold">PA Escalation Queue</h2>
         </div>
       </div>
       <div className="mt-5 space-y-3">
@@ -31,7 +31,7 @@ export function PAAnnouncementPanel({ announcements }: PAAnnouncementPanelProps)
         ))}
       </div>
       <p className="mt-4 border border-border bg-panel-strong p-3 text-sm font-semibold text-muted">
-        Public announcement fallback supports urgent or unresolved cases. It does not automatically resolve any person or item case.
+        Urgent cases can be escalated immediately. Unresolved cases can be moved to the PA queue after review.
       </p>
     </section>
   );

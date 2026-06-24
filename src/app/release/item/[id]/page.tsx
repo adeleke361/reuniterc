@@ -15,8 +15,8 @@ export default async function ItemReleasePage({ params }: ItemReleasePageProps) 
   return (
     <AppShell
       eyebrow="Verified item release"
-      title="Proof-of-ownership workflow"
-      subtitle="A found item is not released until claimant proof is verified. Final release is blocked while connectivity is degraded."
+      title="Verified Item Release"
+      subtitle="Proof-of-ownership verification is required before item release. Final release is blocked while connectivity is degraded."
     >
       <ItemReleaseWorkflow
         match={scenario.match}

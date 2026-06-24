@@ -149,7 +149,7 @@ async function downloadPosterPng(point: ReunitePoint, qrSvg: SVGElement) {
   context.strokeRect(42, 42, canvas.width - 84, canvas.height - 84);
 
   drawText(context, "ReuniteRC", 92, 145, "700 72px Arial", "#ffffff");
-  drawText(context, "INFORMATION BUREAU SUPPORT LAYER", 92, 190, "700 24px Arial", "#fde68a");
+  drawText(context, "DIGITAL INFORMATION BUREAU", 92, 190, "700 24px Arial", "#fde68a");
   drawText(context, "OFFICIAL REUNITE POINT", 92, 305, "700 28px Arial", "#b91c1c");
   drawText(context, point.name, 92, 410, "800 64px Arial", "#0b2d63", 820, 76);
   drawText(context, point.locationLabel, 92, 530, "700 34px Arial", "#334155", 820, 44);

@@ -3,7 +3,7 @@ import type { ConnectivityStatus } from "../domain/types";
 export const guidedDemoSteps = [
   {
     id: "ready-rp014",
-    label: "Ready / View RP-014",
+    label: "View RP-014",
     route: "/reunite-points",
     summary: "Arena Rear Reunite Point is the reporting source."
   },
@@ -21,7 +21,7 @@ export const guidedDemoSteps = [
   },
   {
     id: "person-match-recommended",
-    label: "Person match recommended",
+    label: "Likely person match",
     route: "/matches/person",
     summary: "Information Bureau reviews a rule-based recommendation."
   },
@@ -39,7 +39,7 @@ export const guidedDemoSteps = [
   },
   {
     id: "item-match-recommended",
-    label: "Lost-and-found item match",
+    label: "Likely item match",
     route: "/matches/item",
     summary: "Lost and found bag reports are compared transparently."
   },
@@ -51,7 +51,7 @@ export const guidedDemoSteps = [
   },
   {
     id: "offline-queue-test",
-    label: "Low-connectivity/offline queue test",
+    label: "Low-connectivity queue",
     route: "/demo",
     summary: "Degraded connectivity queues staff reports for later sync."
   },

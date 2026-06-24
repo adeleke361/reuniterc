@@ -8,8 +8,8 @@ export default async function AnnouncementsPage() {
   return (
     <AppShell
       eyebrow="Fallback workflow"
-      title="PA fallback queue"
-      subtitle="Privacy-conscious PA fallback drafts remain available for urgent or unresolved cases, without automatically resolving any case."
+      title="PA Escalation Queue"
+      subtitle="Urgent cases can be escalated immediately. Unresolved cases can be moved to the PA queue after review."
     >
       <PAAnnouncementPanel announcements={snapshot.announcements} />
     </AppShell>
