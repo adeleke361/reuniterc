@@ -9,7 +9,7 @@ export default async function DemoPage() {
     <AppShell
       eyebrow="Judge Walkthrough"
       title="ReuniteRC Walkthrough"
-      subtitle="Walk through one fictional Information Bureau case from Reunite Point report to likely match review, staff verification, item release, offline queueing, PA escalation, and leadership analytics."
+      subtitle="Walk through one fictional Information Bureau case from Reunite Point report to likely match review, staff verification, item release, offline queueing, PA preparation, and leadership analytics."
     >
       <DemoControlPanel snapshot={snapshot} />
     </AppShell>

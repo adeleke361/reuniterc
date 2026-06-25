@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Route } from "next";
 import {
   ArrowRight,
@@ -19,7 +20,7 @@ export default async function Home() {
   const flowCards = [
     {
       title: "Scan a Reunite Point QR",
-      body: "Official QR codes open reporting with the Point Code and location context already attached.",
+      body: "Official posters around Redemption City open the right reporting page with the Point Code attached.",
       icon: MapPinned
     },
     {
@@ -29,12 +30,12 @@ export default async function Home() {
     },
     {
       title: "Submit the needed details",
-      body: "The form captures useful, non-sensitive details and sends the report to the Information Bureau.",
+      body: "The form captures useful details and sends the report to the Information Desk for review.",
       icon: FileText
     },
     {
-      title: "Bureau reviews likely matches",
-      body: "ReuniteRC compares new reports with existing cases and shows likely matches for Information Bureau staff to review.",
+      title: "Staff review likely matches",
+      body: "ReuniteRC compares reports and shows likely matches for staff to review.",
       icon: SearchCheck
     },
     {
@@ -43,38 +44,40 @@ export default async function Home() {
       icon: ShieldCheck
     },
     {
-      title: "Escalate unresolved cases to PA",
-      body: "Urgent cases can be escalated immediately. Unresolved cases can be moved to the PA queue after review.",
+      title: "Prepare PA announcement if unresolved",
+      body: "The Information Desk can prepare unresolved cases for PA announcement after review.",
       icon: Bell
     }
   ];
 
   return (
-    <AppShell>
-      <section className="relative overflow-hidden border border-blue-900/70 bg-[#07142b] p-6 shadow-[0_24px_80px_rgba(7,20,43,0.45)] md:p-10">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-white to-blue-700" />
-        <div className="absolute inset-0 opacity-70">
-          <div className="grid h-full grid-cols-6 grid-rows-4">
-            {Array.from({ length: 24 }).map((_, index) => (
-              <div key={index} className="border border-white/5" />
-            ))}
-          </div>
-        </div>
-        <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div>
-            <p className="mt-6 text-sm font-semibold uppercase tracking-[0.22em] text-amber-200">
-              Digital Information Bureau
+    <AppShell showStatusBar={false}>
+      <section className="relative min-h-[620px] overflow-hidden border border-white/10 bg-[#071a33] shadow-command-glow">
+        <Image
+          src="/images/redemption-arena.png"
+          alt="Redemption City programme arena"
+          fill
+          priority
+          sizes="(min-width: 1024px) 1180px, 100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#06172d]/95 via-[#06172d]/82 to-[#06172d]/35" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#071a33] to-transparent" />
+        <div className="relative flex min-h-[620px] flex-col justify-end p-6 md:p-10">
+          <div className="max-w-4xl border border-white/10 bg-[#06172d]/72 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-sm md:p-7">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-amber-100">
+              ReuniteRC for Redemption City
             </p>
-            <h1 className="mt-4 max-w-4xl text-5xl font-semibold text-white sm:text-6xl">
-              ReuniteRC
+            <h1 className="mt-4 text-4xl font-semibold leading-tight text-white sm:text-6xl">
+              Helping families find each other faster during big programmes.
             </h1>
-            <p className="mt-5 max-w-3xl text-2xl font-semibold leading-9 text-amber-100">
-              A Digital Information Bureau for major programmes in Redemption City.
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-blue-50">
+              Report missing people, found people, lost items, and found items from official Reunite Point QR posters
+              around Redemption City. The Information Desk reviews likely matches, verifies safely, and helps resolve
+              each case.
             </p>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-blue-100/85">
-              ReuniteRC helps attendees and volunteers report missing persons, found persons, lost items, and found
-              items through official Reunite Point QR codes. The Information Bureau can then review likely matches,
-              verify safely, complete handovers, release items, and escalate unresolved cases to PA when needed.
+            <p className="mt-5 max-w-2xl text-xl font-semibold leading-8 text-amber-100">
+              No one should get lost in the crowd. No case should get lost in the process.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -86,85 +89,69 @@ export default async function Home() {
               </Link>
               <Link
                 href={"/dashboard" as Route}
-                className="inline-flex items-center gap-2 rounded-md border border-amber-200/55 px-5 py-3 font-semibold text-amber-100 transition hover:border-amber-100 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-md border border-amber-100/70 px-5 py-3 font-semibold text-amber-50 transition hover:bg-white/10"
               >
-                Information Bureau Dashboard
+                Staff Dashboard
               </Link>
               <Link
                 href={"/reunite-points" as Route}
-                className="inline-flex items-center gap-2 rounded-md border border-white/35 px-5 py-3 font-semibold text-white transition hover:border-amber-200 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-md border border-white/40 px-5 py-3 font-semibold text-white transition hover:bg-white/10"
               >
                 View Reunite Points
               </Link>
               <Link
                 href={"/demo" as Route}
-                className="inline-flex items-center gap-2 rounded-md border border-white/20 px-5 py-3 font-semibold text-blue-100 transition hover:border-cyan/50 hover:bg-cyan/10 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-md border border-white/25 px-5 py-3 font-semibold text-blue-50 transition hover:bg-white/10"
               >
                 Judge Walkthrough
               </Link>
             </div>
           </div>
-          <div className="grid gap-4">
-            <div className="border border-white/15 bg-white/[0.07] p-5">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">Primary Reunite Point</p>
-                  <h2 className="mt-2 text-3xl font-semibold text-white">{arenaPoint?.code} Arena Rear</h2>
+        </div>
+      </section>
+
+      <section className="mt-8 overflow-hidden border border-amber/25 bg-[#f8f3e7] text-blue-950">
+        <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="relative min-h-[300px]">
+            <Image
+              src="/images/redemption-scale.png"
+              alt="Large Redemption City crowd"
+              fill
+              sizes="(min-width: 1024px) 540px, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="p-6 md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8a5d12]">Why it matters</p>
+            <h2 className="mt-3 text-3xl font-semibold">Big crowds need simple reporting and careful follow-up.</h2>
+            <p className="mt-4 leading-7 text-slate-700">
+              During major programmes, a small delay can make a family anxious. ReuniteRC gives attendees, volunteers,
+              and the Information Desk one clear way to capture reports, compare them, and resolve them safely.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                "No facial recognition.",
+                "No live public tracking.",
+                "No automatic reunion.",
+                "No sensitive public case details."
+              ].map((rule) => (
+                <div key={rule} className="border border-amber/30 bg-white p-4 font-semibold text-blue-950">
+                  {rule}
                 </div>
-                <MapPinned className="size-9 text-red-300" aria-hidden="true" />
-              </div>
-              <p className="mt-4 text-sm leading-6 text-blue-100/80">{arenaPoint?.fallbackInstruction}</p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="border border-white/15 bg-white/[0.06] p-4">
-                <ShieldCheck className="size-5 text-green-300" aria-hidden="true" />
-                <p className="mt-3 font-semibold text-white">Verified handover</p>
-              </div>
-              <div className="border border-white/15 bg-white/[0.06] p-4">
-                <WifiOff className="size-5 text-amber-200" aria-hidden="true" />
-                <p className="mt-3 font-semibold text-white">Offline queue</p>
-              </div>
-              <div className="border border-white/15 bg-white/[0.06] p-4">
-                <Bell className="size-5 text-red-300" aria-hidden="true" />
-                <p className="mt-3 font-semibold text-white">PA fallback</p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mt-8 grid gap-5 border border-blue-900/45 bg-[#0a162c]/85 p-6 md:grid-cols-[0.85fr_1.15fr]">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200">Core flow</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white">From Reunite Point scan to verified resolution.</h2>
-          <p className="mt-4 text-sm leading-6 text-blue-100/75">
-            The public side captures reports. The Information Bureau side reviews, verifies, completes handovers or item
-            releases, and escalates to PA when review shows more help is needed.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {[
-            "No facial recognition.",
-            "No live public tracking.",
-            "No automatic reunion.",
-            "No sensitive public case details."
-          ].map((rule) => (
-            <article key={rule} className="border border-white/10 bg-white/[0.05] p-4">
-              <ShieldCheck className="size-5 text-cyan" aria-hidden="true" />
-              <p className="mt-3 font-semibold text-white">{rule}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <section id="how-it-works" className="mt-8 grid scroll-mt-24 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {flowCards.map((card, index) => {
           const Icon = card.icon;
           return (
-            <article key={card.title} className="border border-blue-900/45 bg-[#081426]/85 p-5">
+            <article key={card.title} className="border border-white/10 bg-white/[0.07] p-5">
               <div className="flex items-start justify-between gap-4">
-                <p className="text-3xl font-semibold text-amber-200">{index + 1}</p>
-                <span className="grid size-10 place-items-center rounded-md border border-cyan/30 bg-cyan/10 text-cyan">
+                <p className="text-3xl font-semibold text-amber-soft">{index + 1}</p>
+                <span className="grid size-10 place-items-center rounded-md border border-amber/30 bg-white/10 text-amber-soft">
                   <Icon className="size-5" aria-hidden="true" />
                 </span>
               </div>
@@ -173,6 +160,42 @@ export default async function Home() {
             </article>
           );
         })}
+      </section>
+
+      <section className="mt-8 overflow-hidden border border-white/10 bg-[#0f2748]">
+        <div className="grid gap-0 lg:grid-cols-[1fr_0.9fr]">
+          <div className="p-6 md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-soft">Built for Redemption City</p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">Reunite Points point to a place, not a person.</h2>
+            <p className="mt-4 leading-7 text-blue-100/80">
+              Each poster gives the Information Desk the reporting location. If network service is poor, the printed
+              Point Code still helps an official volunteer or usher direct the case to the right desk.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="border border-white/10 bg-white/[0.06] p-4">
+                <MapPinned className="size-5 text-amber-soft" aria-hidden="true" />
+                <p className="mt-3 font-semibold text-white">{arenaPoint?.code} Arena Rear</p>
+              </div>
+              <div className="border border-white/10 bg-white/[0.06] p-4">
+                <WifiOff className="size-5 text-amber-soft" aria-hidden="true" />
+                <p className="mt-3 font-semibold text-white">Offline can queue reports</p>
+              </div>
+              <div className="border border-white/10 bg-white/[0.06] p-4">
+                <ShieldCheck className="size-5 text-green-300" aria-hidden="true" />
+                <p className="mt-3 font-semibold text-white">Final actions need stable connectivity</p>
+              </div>
+            </div>
+          </div>
+          <div className="relative min-h-[320px]">
+            <Image
+              src="/images/redemption-location.png"
+              alt="Redemption City location and access area"
+              fill
+              sizes="(min-width: 1024px) 500px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
       </section>
     </AppShell>
   );

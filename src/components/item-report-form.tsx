@@ -32,7 +32,7 @@ export function ItemReportForm({ points, initialIntent = "lost_item" }: ItemRepo
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Item report</p>
           <h2 className="mt-2 text-3xl font-semibold">{heading}</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-            Reunite Point {selectedPoint?.code ?? ""} gives the Information Bureau the reporting location. Finder and
+            Reunite Point {selectedPoint?.code ?? ""} gives the Information Desk the reporting location. Finder and
             claimant contact details are not exposed to each other.
           </p>
         </div>
@@ -102,7 +102,7 @@ export function ItemReportForm({ points, initialIntent = "lost_item" }: ItemRepo
         <label className="space-y-2 md:col-span-2">
           <span className="text-sm font-semibold text-muted">Reporter reference for staff follow-up</span>
           <input
-            placeholder="Name or reference for Information Bureau verification"
+            placeholder="Name or reference for Information Desk verification"
             className="w-full border border-border bg-panel-strong px-3 py-3 text-foreground outline-none focus:border-cyan"
           />
         </label>
@@ -114,12 +114,12 @@ export function ItemReportForm({ points, initialIntent = "lost_item" }: ItemRepo
           className="inline-flex items-center gap-2 rounded-md bg-cyan px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
         >
           <Send className="size-4" aria-hidden="true" />
-          Submit to Information Bureau
+          Submit to Information Desk
         </button>
         {submitted && (
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300">
             <PackagePlus className="size-4" aria-hidden="true" />
-            Item report sent to the Information Bureau for review.
+            Item report sent to the Information Desk for review.
           </p>
         )}
       </div>

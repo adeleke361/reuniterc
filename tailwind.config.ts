@@ -10,25 +10,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#050809",
-        foreground: "#eefafa",
-        panel: "#0b1214",
-        "panel-strong": "#101a1e",
-        border: "#1c3338",
-        muted: "#8aa3a8",
+        background: "#071a33",
+        foreground: "#f8fafc",
+        panel: "#0f2748",
+        "panel-strong": "#153861",
+        border: "#2b4d79",
+        muted: "#c8d4e5",
         cyan: {
-          DEFAULT: "#22d3ee",
-          soft: "#67e8f9",
-          deep: "#0891b2"
+          DEFAULT: "#f3bd53",
+          soft: "#f8d99a",
+          deep: "#b7791f"
         },
         teal: {
-          DEFAULT: "#14b8a6",
-          soft: "#5eead4",
-          deep: "#0f766e"
+          DEFAULT: "#4fb477",
+          soft: "#8bd3a4",
+          deep: "#237a4b"
         },
         amber: {
-          DEFAULT: "#f59e0b",
-          soft: "#fbbf24"
+          DEFAULT: "#d8a13d",
+          soft: "#f1c979"
         }
       },
       fontFamily: {
@@ -43,7 +43,7 @@ const config: Config = {
         ]
       },
       boxShadow: {
-        "command-glow": "0 0 32px rgba(34, 211, 238, 0.12)"
+        "command-glow": "0 18px 48px rgba(7, 26, 51, 0.18)"
       }
     }
   },

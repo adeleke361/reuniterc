@@ -18,7 +18,7 @@ export default async function PersonReportPage({ searchParams }: PersonReportPag
     <AppShell
       eyebrow="Report capture"
       title="Person Report"
-      subtitle="Report a missing person or found person from a Reunite Point. Information Bureau staff review likely matches and verify before any handover."
+      subtitle="Report a missing person or found person from a Reunite Point. The Information Desk reviews likely matches and verifies before any handover."
     >
       <PersonReportForm points={snapshot.reunitePoints} initialIntent={initialIntent} />
     </AppShell>

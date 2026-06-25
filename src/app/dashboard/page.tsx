@@ -1,3 +1,5 @@
+import Link from "next/link";
+import type { Route } from "next";
 import { Bell, CheckCircle2, ClipboardCheck, MapPinned, PackageCheck, SearchCheck, ShieldCheck } from "lucide-react";
 import { ActivityTimeline } from "../../components/activity-timeline";
 import { AppShell } from "../../components/app-shell";
@@ -39,21 +41,21 @@ export default async function DashboardPage() {
     <AppShell
       eyebrow="Information Bureau"
       title="Information Bureau Dashboard"
-      subtitle="Command center for new reports, likely matches, verification work, PA escalation queue, resolved cases, and offline sync status."
+      subtitle="Work queue for new reports, likely matches, verification, PA preparation, resolved cases, and offline sync."
     >
       <div className="space-y-7">
         <section className="grid gap-4 md:grid-cols-5">
           <MetricCard label="New Reports" value={newReports.length} detail="Awaiting Bureau review" tone="cyan" icon={ClipboardCheck} />
           <MetricCard label="Likely Matches" value={likelyMatches} detail="Staff review queue" tone="amber" icon={SearchCheck} />
           <MetricCard label="Needs Verification" value={needsVerification} detail="Before handover or release" tone="red" icon={ShieldCheck} />
-          <MetricCard label="PA Escalation Queue" value={paQueue} detail="Fallback after review" tone="amber" icon={Bell} />
+          <MetricCard label="PA Preparation" value={paQueue} detail="Prepared after review" tone="amber" icon={Bell} />
           <MetricCard label="Resolved Cases" value={resolvedCases} detail={`${dashboard.safelyReunitedTotal} reunited / ${dashboard.releasedItemsTotal} released`} tone="emerald" icon={CheckCircle2} />
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
           <article className="border border-border bg-panel/90 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">New Reports</p>
-            <h2 className="mt-2 text-2xl font-semibold">Reports awaiting Information Bureau review</h2>
+            <h2 className="mt-2 text-2xl font-semibold">Reports awaiting staff review</h2>
             <div className="mt-5 space-y-3">
               {newReports.slice(0, 5).map((report) => (
                 <div key={report.id} className="border border-border bg-panel-strong p-4">
@@ -72,25 +74,45 @@ export default async function DashboardPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Likely Matches</p>
             <h2 className="mt-2 text-2xl font-semibold">Staff review required</h2>
             <p className="mt-3 text-sm leading-6 text-muted">
-              ReuniteRC compares new reports with existing cases and shows likely matches for Information Bureau staff to review.
+              ReuniteRC compares reports and shows likely matches for staff to review.
             </p>
             <div className="mt-5 space-y-3">
-              <div className="flex items-center justify-between border border-border bg-panel-strong p-4">
+              <Link
+                href={"/matches/person" as Route}
+                className="flex items-center justify-between border border-border bg-panel-strong p-4 transition hover:border-amber/45 hover:bg-white/10"
+              >
                 <div>
                   <p className="font-semibold">Person Match Review</p>
                   <p className="mt-1 text-sm text-muted">{snapshot.personRecommendations.length} likely match</p>
                 </div>
                 <SearchCheck className="size-5 text-amber-soft" aria-hidden="true" />
-              </div>
-              <div className="flex items-center justify-between border border-border bg-panel-strong p-4">
+              </Link>
+              <Link
+                href={"/matches/item" as Route}
+                className="flex items-center justify-between border border-border bg-panel-strong p-4 transition hover:border-amber/45 hover:bg-white/10"
+              >
                 <div>
                   <p className="font-semibold">Item Match Review</p>
                   <p className="mt-1 text-sm text-muted">{snapshot.itemRecommendations.length} likely match</p>
                 </div>
                 <PackageCheck className="size-5 text-amber-soft" aria-hidden="true" />
-              </div>
+              </Link>
               <div className="border border-amber/35 bg-amber/10 p-4 text-sm font-semibold leading-6 text-amber-soft">
-                Staff verification is required before reunion or item release.
+                Staff verification is required before handover or item release.
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Link
+                  href={"/announcements" as Route}
+                  className="border border-border bg-panel-strong p-4 text-sm font-semibold transition hover:border-amber/45 hover:bg-white/10"
+                >
+                  PA Preparation
+                </Link>
+                <Link
+                  href={"/analytics" as Route}
+                  className="border border-border bg-panel-strong p-4 text-sm font-semibold transition hover:border-amber/45 hover:bg-white/10"
+                >
+                  Leadership Analytics
+                </Link>
               </div>
             </div>
           </article>

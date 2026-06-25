@@ -46,7 +46,7 @@ export function OfflineQueuePanel({ operations, runtimeQueued = 0 }: OfflineQueu
         )}
       </div>
       <p className="mt-4 border border-border bg-panel-strong p-3 text-sm font-semibold text-muted">
-        Match confirmation, person handover and item release remain blocked until connectivity is stable.
+        Offline can queue reports, but final match confirmation, handover, and item release require stable connectivity.
       </p>
     </section>
   );

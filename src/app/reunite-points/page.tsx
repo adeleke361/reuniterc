@@ -9,7 +9,7 @@ export default async function ReunitePointsPage() {
     <AppShell
       eyebrow="Reunite Points"
       title="Reunite Point Posters"
-      subtitle="Prepare official Reunite Point posters with a visible Point Code, location name, short URL, no-internet fallback instruction and tamper-check guidance."
+      subtitle="Prepare official posters for Redemption City locations. Each QR points to a reporting location, not a person or private record."
     >
       <ReunitePointPosterStudio points={snapshot.reunitePoints} />
     </AppShell>

@@ -10,7 +10,7 @@ export default async function PersonMatchesPage() {
     <AppShell
       eyebrow="Information Bureau"
       title="Person Match Review"
-      subtitle="ReuniteRC compares new reports with existing cases and shows likely matches for Information Bureau staff to review. Staff verification is required before reunion."
+      subtitle="ReuniteRC compares reports and shows likely matches for staff to review. Staff verification is required before handover."
     >
       <div className="space-y-5">
         {snapshot.personRecommendations.map((recommendation) => {
@@ -26,7 +26,7 @@ export default async function PersonMatchesPage() {
               score={recommendation.score}
               tier={recommendation.tier}
               reasons={recommendation.reasons}
-              footer="Staff verification is required before reunion."
+              footer="Staff verification is required before handover."
               actionHref={`/handover/person/${recommendation.id}`}
               actionLabel="Start verification"
             />

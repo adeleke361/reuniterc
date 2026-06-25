@@ -8,8 +8,8 @@ export default async function AnnouncementsPage() {
   return (
     <AppShell
       eyebrow="Fallback workflow"
-      title="PA Escalation Queue"
-      subtitle="Urgent cases can be escalated immediately. Unresolved cases can be moved to the PA queue after review."
+      title="PA Preparation Queue"
+      subtitle="The Information Desk can prepare unresolved cases for PA announcement after review. ReuniteRC does not announce anything automatically."
     >
       <PAAnnouncementPanel announcements={snapshot.announcements} />
     </AppShell>

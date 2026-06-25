@@ -32,7 +32,7 @@ export function PersonReportForm({ points, initialIntent = "looking_for_person" 
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Person report</p>
           <h2 className="mt-2 text-3xl font-semibold">{heading}</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-            Reunite Point {selectedPoint?.code ?? ""} gives the Information Bureau the reporting location. Sensitive
+            Reunite Point {selectedPoint?.code ?? ""} gives the Information Desk the reporting location. Sensitive
             notes remain staff-only.
           </p>
         </div>
@@ -112,7 +112,7 @@ export function PersonReportForm({ points, initialIntent = "looking_for_person" 
         <label className="space-y-2 md:col-span-2">
           <span className="text-sm font-semibold text-muted">Reporter reference for staff follow-up</span>
           <input
-            placeholder="Name or reference to help Information Bureau staff verify safely"
+            placeholder="Name or reference to help the Information Desk verify safely"
             className="w-full border border-border bg-panel-strong px-3 py-3 text-foreground outline-none focus:border-cyan"
           />
         </label>
@@ -124,12 +124,12 @@ export function PersonReportForm({ points, initialIntent = "looking_for_person" 
           className="inline-flex items-center gap-2 rounded-md bg-cyan px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-soft"
         >
           <Send className="size-4" aria-hidden="true" />
-          Submit to Information Bureau
+          Submit to Information Desk
         </button>
         {submitted && (
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300">
             <UserRoundCheck className="size-4" aria-hidden="true" />
-            Report sent to the Information Bureau for review.
+            Report sent to the Information Desk for review.
           </p>
         )}
       </div>

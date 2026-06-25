@@ -198,7 +198,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
                   <h3 className="mt-2 text-2xl font-semibold text-white">Queue a staff report offline</h3>
                   <p className="mt-3 leading-7 text-blue-100/75">
                     Authorised staff who already loaded the app can queue reports while degraded. Match confirmation,
-                    person handover and item release stay blocked until connectivity is stable.
+                    person handover and item release require stable connectivity.
                   </p>
                   <div className="mt-5 flex flex-wrap items-center gap-3">
                     <ConnectivityToggle value={state.connectivityStatus} onChange={setConnectivity} />
@@ -245,7 +245,7 @@ export function DemoControlPanel({ snapshot }: DemoControlPanelProps) {
             <p>Online mode: scan a Reunite Point and submit digitally.</p>
             <p>Staff offline mode: queue reports after the app has already loaded.</p>
             <p>No-internet fallback: report the printed Point Code to official staff.</p>
-            <p>PA fallback: urgent cases can be escalated immediately. Unresolved cases can be moved to the PA queue after review.</p>
+            <p>PA fallback: the Information Desk can prepare unresolved cases for PA announcement after review.</p>
           </div>
         </article>
       </section>
